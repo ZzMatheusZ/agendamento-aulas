@@ -5,64 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Agendamento de Aulas Funcionais</title>
   <meta name="description" content="Agende sua vaga na aula de treinamento funcional do fim de semana." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <style>
     :root {
-      --laranja:#f97316;
-      --laranja-escuro:#ea580c;
-      --preto:#0c0c0c;
-      --cinza-900:#171717;
-      --cinza-800:#1f1f1f;
-      --cinza-700:#2a2a2a;
-      --cinza-200:#e5e5e5;
-      --cinza-100:#f5f5f5;
-      --branco:#ffffff;
-      --verde:#22c55e;
-      --vermelho:#ef4444;
-      --amarelo:#f59e0b;
-      --raio:16px;
-      --sombra:0 4px 20px rgba(0,0,0,.08);
-      --sombra-forte:0 8px 30px rgba(0,0,0,.16);
+      --laranja:#f97316; --laranja-escuro:#ea580c; --preto:#0c0c0c; --cinza-900:#171717; --cinza-800:#1f1f1f; --cinza-700:#2a2a2a; --cinza-200:#e5e5e5; --cinza-100:#f5f5f5; --branco:#fff; --verde:#22c55e; --vermelho:#ef4444; --amarelo:#f59e0b;
+      --raio:16px; --sombra:0 4px 20px rgba(0,0,0,.08); --sombra-forte:0 8px 30px rgba(0,0,0,.16);
     }
     * { box-sizing:border-box; }
     html { scroll-behavior:smooth; }
     body {
-      margin:0;
-      font-family:'Inter',system-ui,-apple-system,sans-serif;
-      background:#fff;
-      color:var(--preto);
-      line-height:1.5;
-      -webkit-font-smoothing:antialiased;
+      margin:0; font-family:'Inter',system-ui,-apple-system,sans-serif; background:#fff; color:var(--preto); line-height:1.5; -webkit-font-smoothing:antialiased;
     }
     button, input, select, textarea { font:inherit; }
     button { cursor:pointer; }
     .hidden { display:none !important; }
     .container { max-width:960px; margin:0 auto; padding:24px 16px 72px; }
-    .nav {
-      position:sticky; top:0; z-index:50;
-      background:var(--preto); color:var(--branco);
-      display:flex; align-items:center; justify-content:space-between;
-      gap:12px; padding:14px 20px; box-shadow:0 2px 12px rgba(0,0,0,.25);
-    }
+    .nav { position:sticky; top:0; z-index:50; background:var(--preto); color:#fff; display:flex; justify-content:space-between; align-items:center; gap:12px; padding:14px 20px; box-shadow:0 2px 12px rgba(0,0,0,.25); }
     .nav-brand { display:flex; align-items:center; gap:10px; font-weight:800; }
-    .logo {
-      width:38px; height:38px; border-radius:12px;
-      background:var(--laranja); display:flex; align-items:center; justify-content:center;
-    }
+    .logo { width:38px; height:38px; border-radius:12px; background:var(--laranja); display:flex; align-items:center; justify-content:center; }
     .nav-acoes { display:flex; gap:8px; }
-    .btn-nav {
-      background:transparent; border:none; color:#fff; padding:10px 16px; border-radius:12px; font-weight:700; cursor:pointer;
-    }
+    .btn-nav { background:transparent; border:none; color:#fff; padding:10px 16px; border-radius:12px; font-weight:700; cursor:pointer; }
     .btn-nav.ativo { background:var(--laranja); }
     .btn-nav:not(.ativo):hover { background:var(--cinza-700); }
-    .btn {
-      display:inline-flex; align-items:center; justify-content:center; gap:8px;
-      padding:14px 24px; border-radius:14px; font-weight:800; border:2px solid transparent; transition:.2s; text-decoration:none;
-    }
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:14px 24px; border-radius:14px; font-weight:800; border:2px solid transparent; transition:.2s; text-decoration:none; }
     .btn-primario { background:var(--laranja); color:#fff; }
     .btn-primario:hover { background:var(--laranja-escuro); }
     .btn-secundario { background:var(--preto); color:#fff; }
@@ -73,20 +42,10 @@
     .btn-perigo { background:var(--vermelho); color:#fff; }
     .btn-pequeno { padding:8px 12px; font-size:.82rem; border-radius:10px; }
     .btn-bloqueado { width:100%; }
-    .card {
-      background:#fff; border-radius:var(--raio); box-shadow:var(--sombra); border:1px solid var(--cinza-200); padding:24px;
-    }
-    .aula-destaque {
-      background:linear-gradient(135deg, var(--preto) 0%, var(--cinza-900) 100%); color:#fff;
-      border-radius:24px; padding:32px 24px; position:relative; overflow:hidden; box-shadow:var(--sombra-forte);
-    }
-    .aula-destaque::before {
-      content:''; position:absolute; right:-60px; top:-60px; width:220px; height:220px; background:radial-gradient(circle, rgba(249,115,22,.35), transparent 70%);
-    }
-    .aula-etiqueta {
-      display:inline-block; background:var(--laranja); color:#fff; font-size:.72rem; font-weight:800; letter-spacing:1px; text-transform:uppercase;
-      padding:6px 14px; border-radius:999px; margin-bottom:16px;
-    }
+    .card { background:#fff; border-radius:var(--raio); box-shadow:var(--sombra); border:1px solid var(--cinza-200); padding:24px; }
+    .aula-destaque { background:linear-gradient(135deg, var(--preto) 0%, var(--cinza-900) 100%); color:#fff; border-radius:24px; padding:32px 24px; position:relative; overflow:hidden; box-shadow:var(--sombra-forte); }
+    .aula-destaque::before { content:''; position:absolute; right:-60px; top:-60px; width:220px; height:220px; background:radial-gradient(circle, rgba(249,115,22,.35), transparent 70%); }
+    .aula-etiqueta { display:inline-block; background:var(--laranja); color:#fff; font-size:.72rem; font-weight:800; letter-spacing:1px; text-transform:uppercase; padding:6px 14px; border-radius:999px; margin-bottom:16px; }
     .aula-titulo { font-size:2rem; font-weight:900; line-height:1.15; margin:0 0 8px; }
     .aula-descricao { color:#c9c9c9; margin:0 0 20px; max-width:560px; }
     .aula-info { display:grid; grid-template-columns:1fr; gap:12px; margin-bottom:24px; }
@@ -94,117 +53,65 @@
     .aula-info-item .ic { font-size:1.3rem; }
     .aula-info-item .rotulo { font-size:.72rem; letter-spacing:.8px; color:#aaa; text-transform:uppercase; font-weight:700; }
     .aula-info-item .valor { font-weight:800; font-size:1.05rem; }
-    .badge {
-      display:inline-flex; align-items:center; gap:6px; font-size:.72rem; font-weight:800; letter-spacing:.5px; text-transform:uppercase; border-radius:999px; padding:5px 12px;
-    }
+    .badge { display:inline-flex; align-items:center; gap:6px; font-size:.72rem; font-weight:800; letter-spacing:.5px; text-transform:uppercase; border-radius:999px; padding:5px 12px; }
     .badge-lotada { background:var(--vermelho); color:#fff; }
     .badge-ultima { background:var(--amarelo); color:#000; }
     .badge-fechada { background:var(--cinza-700); color:#fff; }
-    .badge-pendente { background:#fef3c7; color:#92400e; }
-    .badge-pago { background:#dcfce7; color:#166534; }
-    .badge-cancelado { background:#fee2e2; color:#991b1b; }
-    .badge-espera { background:#e0e7ff; color:#3730a3; }
-    .banner {
-      background:var(--amarelo); color:var(--preto); border-radius:14px; padding:14px 18px; font-weight:700; margin-bottom:20px;
-      display:flex; align-items:center; gap:8px;
-    }
+    .banner { background:var(--amarelo); color:var(--preto); border-radius:14px; padding:14px 18px; font-weight:700; margin-bottom:20px; display:flex; align-items:center; gap:8px; }
     .banner-vermelho { background:var(--vermelho); color:#fff; }
-    .banner-cinza { background:var(--cinza-100); color:var(--preto); }
     .campo { margin-bottom:16px; }
     .campo label { display:block; font-weight:700; font-size:.88rem; margin-bottom:6px; }
-    .campo input, .campo select, .campo textarea {
-      width:100%; padding:13px 14px; border-radius:12px; border:2px solid var(--cinza-200); background:#fff; color:#111; transition:.2s;
-    }
-    .campo input:focus, .campo select:focus, .campo textarea:focus {
-      outline:none; border-color:var(--laranja); box-shadow:0 0 0 3px rgba(249,115,22,.15);
-    }
+    .campo input, .campo select, .campo textarea { width:100%; padding:13px 14px; border-radius:12px; border:2px solid var(--cinza-200); background:#fff; color:#111; transition:.2s; }
+    .campo input:focus, .campo select:focus, .campo textarea:focus { outline:none; border-color:var(--laranja); box-shadow:0 0 0 3px rgba(249,115,22,.15); }
     .campo textarea { min-height:90px; resize:vertical; }
     .campo-escuro label { color:#fff; }
-    .campo-escuro input, .campo-escuro select, .campo-escuro textarea {
-      background:var(--cinza-800); border-color:var(--cinza-700); color:#fff;
-    }
+    .campo-escuro input, .campo-escuro select, .campo-escuro textarea { background:var(--cinza-800); border-color:var(--cinza-700); color:#fff; }
     .campo-escuro input::placeholder, .campo-escuro textarea::placeholder { color:#777; }
-    .login-wrap{ max-width:420px; margin:60px auto; padding:0 16px; }
-    .login-card {
-      background:var(--preto); color:#fff; border-radius:24px; padding:32px 28px; box-shadow:var(--sombra-forte); text-align:center;
-    }
+    .login-wrap { max-width:420px; margin:60px auto; padding:0 16px; }
+    .login-card { background:var(--preto); color:#fff; border-radius:24px; padding:32px 28px; box-shadow:var(--sombra-forte); text-align:center; }
     .login-card h2 { margin:0 0 8px; font-size:1.55rem; }
     .login-card p { color:#aaa; margin:0 0 22px; }
-    .adm-topo {
-      background:var(--preto); color:#fff; display:flex; justify-content:space-between; align-items:center;
-      padding:16px 20px; position:sticky; top:0; z-index:40;
-    }
+    .adm-topo { background:var(--preto); color:#fff; display:flex; justify-content:space-between; align-items:center; padding:16px 20px; position:sticky; top:0; z-index:40; }
     .adm-wrap { max-width:1200px; margin:0 auto; padding:20px 16px 60px; display:grid; grid-template-columns:1fr; gap:20px; }
     .adm-menu { display:flex; gap:8px; overflow-x:auto; padding-bottom:6px; }
-    .adm-menu button {
-      background:#f5f5f5; color:#111; border:none; border-radius:12px; padding:11px 16px; font-weight:700; min-width:max-content;
-    }
+    .adm-menu button { background:#f5f5f5; color:#111; border:none; border-radius:12px; padding:11px 16px; font-weight:700; min-width:max-content; }
     .adm-menu button.ativo { background:var(--laranja); color:#fff; }
     .sec-adm { display:none; }
     .sec-adm.ativo { display:block; }
     .sec-titulo { font-size:1.3rem; margin:0 0 6px; }
     .sec-sub { color:#777; margin:0 0 18px; }
-    .bloco-adm {
-      background:var(--cinza-900); color:#fff; border-radius:var(--raio); padding:22px; border:1px solid var(--cinza-700); margin-bottom:18px;
-    }
+    .bloco-adm { background:var(--cinza-900); color:#fff; border-radius:var(--raio); padding:22px; border:1px solid var(--cinza-700); margin-bottom:18px; }
     .bloco-adm h3 { margin:0 0 16px; font-size:1.05rem; }
     .grade-campos { display:grid; gap:0 16px; }
-    .busca-adm {
-      width:100%; padding:13px 16px; border-radius:12px; border:2px solid var(--cinza-700); background:var(--cinza-800); color:#fff; margin-bottom:14px;
-    }
+    .busca-adm { width:100%; padding:13px 16px; border-radius:12px; border:2px solid var(--cinza-700); background:var(--cinza-800); color:#fff; margin-bottom:14px; }
     .tabela-wrap { overflow-x:auto; border-radius:14px; border:1px solid var(--cinza-700); }
     table { width:100%; border-collapse:collapse; min-width:760px; }
     thead th { background:var(--cinza-800); color:#bbb; font-size:.72rem; text-transform:uppercase; letter-spacing:.8px; padding:12px 14px; text-align:left; }
     tbody td { padding:12px 14px; border-top:1px solid var(--cinza-700); font-size:.9rem; }
     tbody tr:hover { background:var(--cinza-800); }
-    .status-select {
-      background:var(--cinza-800); border:1px solid var(--cinza-700); color:#fff; border-radius:8px; padding:6px 8px; font-size:.8rem; font-weight:700;
-    }
-    .modal-fundo {
-      position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:100; display:none; align-items:flex-end; justify-content:center;
-    }
+    .status-select { background:var(--cinza-800); border:1px solid var(--cinza-700); color:#fff; border-radius:8px; padding:6px 8px; font-size:.8rem; font-weight:700; }
+    .modal-fundo { position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:100; display:none; align-items:flex-end; justify-content:center; }
     .modal-fundo.aberto { display:flex; }
-    .modal {
-      width:min(520px, 100%); max-height:92vh; overflow-y:auto; background:#fff; border-radius:24px 24px 0 0; padding:26px 20px 30px; animation:subir .25s ease;
-    }
+    .modal { width:min(520px, 100%); max-height:92vh; overflow-y:auto; background:#fff; border-radius:24px 24px 0 0; padding:26px 20px 30px; animation:subir .25s ease; }
     @keyframes subir { from { transform:translateY(40px); opacity:0; } to { transform:translateY(0); opacity:1; } }
-    .modal-fechar {
-      float:right; width:36px; height:36px; border:none; background:#f5f5f5; border-radius:50%; font-weight:800; cursor:pointer;
-    }
+    .modal-fechar { float:right; width:36px; height:36px; border:none; background:#f5f5f5; border-radius:50%; font-weight:800; cursor:pointer; }
     .resumo-aula { background:#f5f5f5; border-radius:14px; padding:16px; margin-bottom:18px; }
     .resumo-aula .linha, .dados-reserva .linha { display:flex; justify-content:space-between; gap:10px; padding:6px 0; font-size:.92rem; }
     .dados-reserva { background:#f5f5f5; border-radius:14px; padding:16px; margin:18px 0; }
-    .bloco-pix {
-      background:#111; border-radius:16px; padding:20px; color:#fff; margin-top:18px; text-align:left; 
-    }
+    .bloco-pix { background:#111; border-radius:16px; padding:20px; color:#fff; margin-top:18px; text-align:left; }
     .bloco-pix h3 { color:var(--laranja); margin:0 0 12px; font-size:1rem; }
-    .chave-pix {
-      background:#1f1f1f; border:1px dashed var(--laranja); border-radius:10px; padding:10px 12px; margin:12px 0; word-break:break-all; color:#ddd;
-    }
+    .chave-pix { background:#1f1f1f; border:1px dashed var(--laranja); border-radius:10px; padding:10px 12px; margin:12px 0; word-break:break-all; color:#ddd; }
     .pix-qr-box { background:#fff; border-radius:12px; padding:14px; text-align:center; margin:12px 0; }
     .toasts { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:200; display:flex; flex-direction:column; gap:8px; width:min(420px, calc(100% - 32px)); }
     .toast { background:#111; color:#fff; border-radius:12px; padding:13px 18px; font-weight:600; box-shadow:var(--sombra-forte); }
     .toast.erro { background:var(--vermelho); }
     .toast.sucesso { background:var(--verde); }
-    @media (min-width:768px){
-      .aula-info { grid-template-columns:repeat(2,1fr); }
-      .grade-campos { grid-template-columns:repeat(2,1fr); }
-      .grade-campos .campo-largo { grid-column:1/-1; }
-      .adm-wrap { grid-template-columns:240px 1fr; }
-      .adm-menu { flex-direction:column; overflow:visible; position:sticky; top:80px; align-self:start; }
-      .modal-fundo { align-items:center; }
-      .modal { border-radius:24px; }
-      .nav { padding:14px 32px; }
-      .container { padding:40px 24px 80px; }
-    }
+    @media (min-width:768px){ .aula-info { grid-template-columns:repeat(2,1fr); } .grade-campos { grid-template-columns:repeat(2,1fr); } .grade-campos .campo-largo { grid-column:1/-1; } .adm-wrap { grid-template-columns:240px 1fr; } .adm-menu { flex-direction:column; overflow:visible; position:sticky; top:80px; align-self:start; } .modal-fundo { align-items:center; } .modal { border-radius:24px; } .nav { padding:14px 32px; } .container { padding:40px 24px 80px; } }
   </style>
 </head>
 <body>
   <header class="nav">
-    <div class="nav-brand">
-      <span class="logo">🏋️</span>
-      <span>Agendamento de Aulas</span>
-    </div>
+    <div class="nav-brand"><span class="logo">🏋️</span><span>Agendamento de Aulas</span></div>
     <nav class="nav-acoes">
       <button class="btn-nav ativo" id="navAgendar" onclick="irPara('agendamento')">📅 Agendamento</button>
       <button class="btn-nav" id="navAdm" onclick="irPara('adm')">🔐 Área ADM</button>
@@ -251,7 +158,6 @@
         <button data-sec="comunicacao" onclick="abrirSec('comunicacao',this)">💬 Comunicação</button>
         <button data-sec="avancado" onclick="abrirSec('avancado',this)">⚙️ Avançado</button>
       </nav>
-
       <div class="adm-conteudo">
         <section class="sec-adm ativo" id="sec-dashboard">
           <h2 class="sec-titulo">📊 Dashboard</h2>
@@ -279,31 +185,17 @@
               <div class="campo campo-escuro campo-largo"><label>Descrição</label><textarea data-cfg="aula.descricao" placeholder="Descreva a aula..."></textarea></div>
             </div>
           </div>
-
           <div class="bloco-adm">
             <h3>🎛️ Controle da aula</h3>
-            <div class="switch-linha laranja-preto">
-              <div><span class="txt">Aula aberta</span><span class="sub">Se fechada, o botão de agendar é desativado</span></div>
-              <label class="switch"><input type="checkbox" data-cfg-switch="aula.aberta" /><span class="slider"></span></label>
-            </div>
-            <div class="switch-linha laranja-preto">
-              <div><span class="txt">Permitir novas reservas</span><span class="sub">Pausa apenas novas reservas</span></div>
-              <label class="switch"><input type="checkbox" data-cfg-switch="aula.permitirReservas" /><span class="slider"></span></label>
-            </div>
-            <div class="switch-linha laranja-preto">
-              <div><span class="txt">Permitir cancelamento</span><span class="sub">O aluno pode cancelar pela mensagem</span></div>
-              <label class="switch"><input type="checkbox" data-cfg-switch="aula.permitirCancelamento" /><span class="slider"></span></label>
-            </div>
-            <div class="switch-linha laranja-preto">
-              <div><span class="txt">Ativar lista de espera</span><span class="sub">Quando lotar, aparece a opção</span></div>
-              <label class="switch"><input type="checkbox" data-cfg-switch="aula.listaEspera" /><span class="slider"></span></label>
-            </div>
+            <div class="switch-linha laranja-preto"><div><span class="txt">Aula aberta</span><span class="sub">Se fechada, o botão de agendar é desativado</span></div><label class="switch"><input type="checkbox" data-cfg-switch="aula.aberta" /><span class="slider"></span></label></div>
+            <div class="switch-linha laranja-preto"><div><span class="txt">Permitir novas reservas</span><span class="sub">Pausa apenas novas reservas</span></div><label class="switch"><input type="checkbox" data-cfg-switch="aula.permitirReservas" /><span class="slider"></span></label></div>
+            <div class="switch-linha laranja-preto"><div><span class="txt">Permitir cancelamento</span><span class="sub">O aluno pode cancelar pela mensagem</span></div><label class="switch"><input type="checkbox" data-cfg-switch="aula.permitirCancelamento" /><span class="slider"></span></label></div>
+            <div class="switch-linha laranja-preto"><div><span class="txt">Ativar lista de espera</span><span class="sub">Quando lotar, aparece a opção</span></div><label class="switch"><input type="checkbox" data-cfg-switch="aula.listaEspera" /><span class="slider"></span></label></div>
             <div class="grade-campos" style="margin-top:14px;">
               <div class="campo campo-escuro"><label>Reservas abrem às</label><input type="time" data-cfg="aula.aberturaReservas" /></div>
               <div class="campo campo-escuro"><label>Reservas encerram às</label><input type="time" data-cfg="aula.encerramentoReservas" /></div>
             </div>
           </div>
-
           <div class="bloco-adm">
             <h3>📋 Campos do formulário</h3>
             <div class="switch-linha laranja-preto"><div><span class="txt">Exibir campo e-mail</span></div><label class="switch"><input type="checkbox" data-cfg-switch="aula.mostrarEmail" /><span class="slider"></span></label></div>
@@ -324,10 +216,7 @@
               <div class="campo campo-escuro campo-largo"><label>Link da localização exata</label><input data-cfg="localizacao.link" placeholder="https://maps.app.goo.gl/..." /></div>
               <div class="campo campo-escuro campo-largo"><label>Instruções para chegar</label><textarea data-cfg="localizacao.instrucoes" placeholder="Ex.: Estacionamento na rua, entrada pelo portão..."></textarea></div>
             </div>
-            <div class="switch-linha laranja-preto">
-              <div><span class="txt">Mostrar localização após o agendamento</span><span class="sub">Se desativado, o aluno não vê o local</span></div>
-              <label class="switch"><input type="checkbox" data-cfg-switch="localizacao.mostrarAposAgendamento" /><span class="slider"></span></label>
-            </div>
+            <div class="switch-linha laranja-preto"><div><span class="txt">Mostrar localização após o agendamento</span><span class="sub">Se desativado, o aluno não vê o local</span></div><label class="switch"><input type="checkbox" data-cfg-switch="localizacao.mostrarAposAgendamento" /><span class="slider"></span></label></div>
           </div>
         </section>
 
@@ -342,14 +231,8 @@
               <div class="campo campo-escuro"><label>Cidade</label><input data-cfg="pagamento.cidade" placeholder="Sua cidade" /></div>
               <div class="campo campo-escuro campo-largo"><label>Instruções de pagamento</label><textarea data-cfg="pagamento.instrucoes" placeholder="Ex.: Envie o comprovante após o pagamento..."></textarea></div>
             </div>
-            <div class="switch-linha laranja-preto">
-              <div><span class="txt">Ativar PIX</span><span class="sub">Mostra o bloco de pagamento após a reserva</span></div>
-              <label class="switch"><input type="checkbox" data-cfg-switch="pagamento.ativo" /><span class="slider"></span></label>
-            </div>
-            <div class="switch-linha laranja-preto">
-              <div><span class="txt">Exibir comprovante</span><span class="sub">Mostra botão para enviar comprovante via WhatsApp</span></div>
-              <label class="switch"><input type="checkbox" data-cfg-switch="pagamento.exibirComprovante" /><span class="slider"></span></label>
-            </div>
+            <div class="switch-linha laranja-preto"><div><span class="txt">Ativar PIX</span><span class="sub">Mostra o bloco de pagamento após a reserva</span></div><label class="switch"><input type="checkbox" data-cfg-switch="pagamento.ativo" /><span class="slider"></span></label></div>
+            <div class="switch-linha laranja-preto"><div><span class="txt">Exibir comprovante</span><span class="sub">Mostra botão para enviar comprovante via WhatsApp</span></div><label class="switch"><input type="checkbox" data-cfg-switch="pagamento.exibirComprovante" /><span class="slider"></span></label></div>
             <div class="campo campo-escuro" style="margin-top:14px;">
               <label>Confirmação do pagamento</label>
               <select data-cfg="pagamento.confirmacao">
@@ -368,9 +251,7 @@
             <div class="tabela-wrap">
               <table>
                 <thead>
-                  <tr>
-                    <th>ID</th><th>Aluno</th><th>WhatsApp</th><th>E-mail</th><th>Aula</th><th>Valor</th><th>Status</th><th>Ações</th>
-                  </tr>
+                  <tr><th>ID</th><th>Aluno</th><th>WhatsApp</th><th>E-mail</th><th>Aula</th><th>Valor</th><th>Status</th><th>Ações</th></tr>
                 </thead>
                 <tbody id="tbodyReservas"></tbody>
               </table>
@@ -431,21 +312,13 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
   <div class="toasts" id="toasts"></div>
 
   <script>
-    const SUPABASE_URL = 'https://SEU_PROJETO.supabase.co';
-    const SUPABASE_ANON_KEY = 'SUA_ANON_KEY';
-    const CONFIGURADO = SUPABASE_URL.indexOf('SEU_PROJETO') === -1 && SUPABASE_ANON_KEY.indexOf('SUA_ANON_KEY') === -1;
-
-    const supabase = CONFIGURADO ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-    }) : null;
+    const SUPABASE_URL = 'https://rajivrfdvlhvywdxcrub.supabase.co';
+    const SUPABASE_ANON_KEY = 'SUA_ANON_KEY_AQUI';
+    const CONFIGURADO = !!SUPABASE_URL && SUPABASE_URL.indexOf('SEU_PROJETO') === -1 && !!SUPABASE_ANON_KEY && SUPABASE_ANON_KEY.indexOf('SUA_ANON_KEY') === -1;
+    const supabase = CONFIGURADO ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }) : null;
 
     const defaultConfig = {
-      aula: {
-        nome:'', descricao:'', data:'', horario:'', duracao:'', vagas:'', preco:'',
-        aberta:true, permitirReservas:true, aberturaReservas:'', encerramentoReservas:'',
-        permitirCancelamento:true, listaEspera:false, mostrarEmail:false, emailObrigatorio:false,
-        mostrarObservacao:false, observacaoObrigatoria:false
-      },
+      aula:{ nome:'', descricao:'', data:'', horario:'', duracao:'', vagas:'', preco:'', aberta:true, permitirReservas:true, aberturaReservas:'', encerramentoReservas:'', permitirCancelamento:true, listaEspera:false, mostrarEmail:false, emailObrigatorio:false, mostrarObservacao:false, observacaoObrigatoria:false },
       localizacao:{ nome:'', endereco:'', link:'', instrucoes:'', mostrarAposAgendamento:true },
       pagamento:{ valor:'', recebedor:'', chavePix:'', cidade:'', instrucoes:'', ativo:true, exibirComprovante:true, confirmacao:'manual' },
       comunicacao:{ whatsapp:'', email:'', msgConfirmacao:'Olá, [NOME]! Seu agendamento para a aula de treinamento funcional foi realizado com sucesso.\n📅 [DATA] às [HORARIO]\n📍 [LOCAL]\n💰 [VALOR]\nReserva: [ID]\nPara cancelar: [LINK_CANCELAR]', msgPosPagamento:'Olá, [NOME]! Recebemos seu pagamento. Sua reserva [ID] está confirmada. Até a aula! 💪', msgCancelamento:'Olá, [NOME]! Sua reserva [ID] foi cancelada. Qualquer dúvida, estamos à disposição.' },
@@ -454,26 +327,9 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
 
     let estado = { config: deepClone(defaultConfig), reservas: [] };
 
-    function deepClone(value) {
-      return JSON.parse(JSON.stringify(value));
-    }
-
-    function merge(base, extra) {
-      const out = deepClone(base);
-      for (const key in extra || {}) {
-        if (out[key] && typeof out[key] === 'object' && !Array.isArray(out[key]) && extra[key] && typeof extra[key] === 'object' && !Array.isArray(extra[key])) {
-          out[key] = merge(out[key], extra[key]);
-        } else {
-          out[key] = extra[key];
-        }
-      }
-      return out;
-    }
-
-    function esc(text) {
-      if (text === null || text === undefined) return '';
-      return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
+    function deepClone(v) { return JSON.parse(JSON.stringify(v)); }
+    function merge(base, extra) { const out = deepClone(base); for (const key in extra || {}) { if (out[key] && typeof out[key] === 'object' && !Array.isArray(out[key]) && extra[key] && typeof extra[key] === 'object' && !Array.isArray(extra[key])) { out[key] = merge(out[key], extra[key]); } else { out[key] = extra[key]; } } return out; }
+    function esc(text) { if (text === null || text === undefined) return ''; return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
     function showToast(message, type='sucesso') {
       const box = document.getElementById('toasts');
@@ -494,20 +350,29 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
         location.hash = '#/agendamento';
         renderPublico();
       } else if (destino === 'adm') {
-        if (isLoggedIn()) {
-          mostrarPainelAdm();
-        } else {
-          document.getElementById('viewPublico').classList.add('hidden');
-          document.getElementById('viewLogin').classList.remove('hidden');
-          document.getElementById('viewAdm').classList.add('hidden');
-          document.getElementById('navAgendar').classList.remove('ativo');
-          document.getElementById('navAdm').classList.add('ativo');
-          document.getElementById('loginEmail').value = '';
-          document.getElementById('loginSenha').value = '';
-          document.getElementById('loginErro').classList.add('hidden');
-          location.hash = '#/adm';
+        if (supabase && supabase.auth) {
+          if (supabase.auth.getSession) {
+            supabase.auth.getSession().then(({ data }) => {
+              if (data?.session) { mostrarPainelAdm(); }
+              else { abrirLoginAdm(); }
+            });
+            return;
+          }
         }
+        abrirLoginAdm();
       }
+    }
+
+    function abrirLoginAdm() {
+      document.getElementById('viewPublico').classList.add('hidden');
+      document.getElementById('viewLogin').classList.remove('hidden');
+      document.getElementById('viewAdm').classList.add('hidden');
+      document.getElementById('navAgendar').classList.remove('ativo');
+      document.getElementById('navAdm').classList.add('ativo');
+      document.getElementById('loginEmail').value = '';
+      document.getElementById('loginSenha').value = '';
+      document.getElementById('loginErro').classList.add('hidden');
+      location.hash = '#/adm';
     }
 
     function mostrarPainelAdm() {
@@ -522,45 +387,27 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
     }
 
     function sairAdm() {
-      if (CONFIGURADO && supabase) {
-        supabase.auth.signOut();
-      }
+      if (supabase && supabase.auth) supabase.auth.signOut();
       irPara('agendamento');
-    }
-
-    function isLoggedIn() {
-      if (!CONFIGURADO || !supabase) return false;
-      return !!supabase.auth.getSession && !!supabase.auth.getSession().data?.session;
-    }
-
-    function abrirSec(sec, btn) {
-      document.querySelectorAll('.sec-adm').forEach(el => el.classList.remove('ativo'));
-      document.getElementById('sec-' + sec).classList.add('ativo');
-      document.querySelectorAll('#admMenu button').forEach(el => el.classList.remove('ativo'));
-      if (btn) btn.classList.add('ativo');
     }
 
     async function fazerLogin() {
       if (!CONFIGURADO || !supabase) {
-        showToast('Configure o Supabase antes de usar o painel ADM.', 'erro');
+        showToast('Configure o URL e a anon key do Supabase antes de usar o painel ADM.', 'erro');
         return;
       }
-
       const email = document.getElementById('loginEmail').value.trim();
       const senha = document.getElementById('loginSenha').value;
-
       if (!email || !senha) {
         document.getElementById('loginErro').classList.remove('hidden');
         return;
       }
-
       const { data, error } = await supabase.auth.signInWithPassword({ email, password: senha });
       if (error) {
         document.getElementById('loginErro').classList.remove('hidden');
         showToast('Credenciais inválidas.', 'erro');
         return;
       }
-
       document.getElementById('loginErro').classList.add('hidden');
       mostrarPainelAdm();
     }
@@ -570,11 +417,8 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
       let s = String(v).trim().replace(/[R$\s]/g,'');
       const temVirgula = s.includes(',');
       const temPonto = s.includes('.');
-      if (temVirgula && temPonto) {
-        s = s.replace(/\./g,'').replace(',', '.');
-      } else if (temVirgula) {
-        s = s.replace(',', '.');
-      }
+      if (temVirgula && temPonto) s = s.replace(/\./g,'').replace(',', '.');
+      else if (temVirgula) s = s.replace(',', '.');
       return parseFloat(s);
     }
 
@@ -584,55 +428,13 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
       return n.toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
     }
 
-    function fmtDataISO(dataISO) {
-      if (!dataISO) return '';
-      try {
-        const d = new Date(dataISO + 'T12:00:00');
-        return d.toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' });
-      } catch (e) {
-        return dataISO;
-      }
-    }
-
-    function fmtDataCurta(dataISO) {
-      if (!dataISO) return '';
-      try {
-        const d = new Date(dataISO + 'T12:00:00');
-        return d.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' });
-      } catch (e) {
-        return dataISO;
-      }
-    }
-
-    function vagasOcupadas() {
-      return estado.reservas.filter(r => ['pendente', 'pago'].includes(r.status)).length;
-    }
-
-    function vagasDisponiveis() {
-      const total = parseInt(estado.config.aula.vagas, 10);
-      if (isNaN(total) || total <= 0) return null;
-      return Math.max(0, total - vagasOcupadas());
-    }
-
-    function aulaLotada() {
-      const disp = vagasDisponiveis();
-      return disp !== null && disp <= 0;
-    }
-
-    function verificarJanelaReservas() {
-      const a = estado.config.aula;
-      if (!a.data) return null;
-      const agora = new Date();
-      if (a.aberturaReservas) {
-        const abertura = new Date(a.data + 'T' + a.aberturaReservas + ':00');
-        if (agora < abertura) return { ok:false, motivo:'Reservas abrem às ' + a.aberturaReservas };
-      }
-      if (a.encerramentoReservas) {
-        const encerramento = new Date(a.data + 'T' + a.encerramentoReservas + ':00');
-        if (agora > encerramento) return { ok:false, motivo:'Reservas encerradas às ' + a.encerramentoReservas };
-      }
-      return null;
-    }
+    function fmtDataISO(dataISO) { if (!dataISO) return ''; try { const d = new Date(dataISO + 'T12:00:00'); return d.toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' }); } catch (e) { return dataISO; } }
+    function fmtDataCurta(dataISO) { if (!dataISO) return ''; try { const d = new Date(dataISO + 'T12:00:00'); return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' }); } catch (e) { return dataISO; } }
+    function vagasOcupadas() { return estado.reservas.filter(r => ['pendente','pago'].includes(r.status)).length; }
+    function vagasDisponiveis() { const total = parseInt(estado.config.aula.vagas, 10); if (isNaN(total) || total <= 0) return null; return Math.max(0, total - vagasOcupadas()); }
+    function aulaLotada() { const disp = vagasDisponiveis(); return disp !== null && disp <= 0; }
+    function linkBase() { return window.location.origin + window.location.pathname; }
+    function gerarIdReserva() { return 'FT-' + Math.random().toString(36).slice(2, 8).toUpperCase(); }
 
     function podeAgendar() {
       const c = estado.config;
@@ -643,17 +445,7 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
       if (!c.aula.permitirReservas) return { ok:false, motivo:'Novas reservas pausadas.' };
       if (!c.aula.nome || !c.aula.data || !c.aula.horario) return { ok:false, motivo:'Aula ainda não configurada.' };
       if (aulaLotada()) return { ok:false, motivo:'AULA LOTADA' };
-      const janela = verificarJanelaReservas();
-      if (janela) return janela;
       return { ok:true };
-    }
-
-    function linkBase() {
-      return window.location.origin + window.location.pathname;
-    }
-
-    function gerarIdReserva() {
-      return 'FT-' + Math.random().toString(36).slice(2, 8).toUpperCase();
     }
 
     function renderPublico() {
@@ -661,7 +453,6 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
       const publicBanners = document.getElementById('bannersPublico');
       publicBanners.innerHTML = '';
       card.innerHTML = '';
-
       const cfg = estado.config;
       const total = parseInt(cfg.aula.vagas, 10) || 0;
       const disponiveis = vagasDisponiveis();
@@ -672,13 +463,12 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
       }
 
       if (!cfg.aula.nome && !cfg.aula.data && !cfg.aula.horario) {
-        card.innerHTML = '<div class="card vazio"><div class="icone">🏋️</div><h3>Aula ainda não configurada</h3><p>O administrador precisa preencher os dados da aula para liberar o agendamento.</p></div>';
+        card.innerHTML = '<div class="card" style="text-align:center; padding:60px 20px;"><div style="font-size:3rem; margin-bottom:12px;">🏋️</div><h3 style="margin:0 0 6px;">Aula ainda não configurada</h3><p style="max-width:420px; margin:0 auto; color:#666;">O administrador precisa preencher os dados da aula para liberar o agendamento.</p></div>';
         return;
       }
 
       const dataFormatada = cfg.aula.data ? fmtDataISO(cfg.aula.data) : 'Data não definida';
       const vagaBadge = bloqueado ? '<span class="badge badge-fechada">Fechada</span>' : (disponiveis !== null && disponiveis <= 2 ? '<span class="badge badge-ultima">Últimas vagas</span>' : '<span class="badge badge-pago">Vagas disponíveis</span>');
-
       const informacoes = [
         ['📅', 'Data', dataFormatada],
         ['⏰', 'Horário', cfg.aula.horario || 'Não informado'],
@@ -687,8 +477,7 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
         ['👥', 'Vagas', disponiveis === null ? '—' : `${disponiveis} disponíveis / ${total}`],
         ['📍', 'Local', cfg.localizacao.nome || 'A definir']
       ];
-
-      const html = `
+      card.innerHTML = `
         <div class="aula-destaque">
           <div class="aula-etiqueta">Aula funcional</div>
           ${vagaBadge}
@@ -708,23 +497,17 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
           <button class="btn btn-primario" ${bloqueado ? 'disabled' : ''} onclick="abrirModalAgendar()">${bloqueado ? 'AGENDAMENTO INDISPONÍVEL' : 'QUERO ME INSCREVER'}</button>
         </div>
       `;
-      card.innerHTML = html;
     }
 
     function abrirModalAgendar() {
       const result = podeAgendar();
-      if (!result.ok) {
-        showToast(result.motivo, 'erro');
-        return;
-      }
-
+      if (!result.ok) { showToast(result.motivo, 'erro'); return; }
       const cfg = estado.config;
       const total = parseInt(cfg.aula.vagas, 10) || 0;
       const disp = vagasDisponiveis();
       const valor = cfg.aula.preco || cfg.pagamento.valor || '0';
-
       const html = `
-        <div class="modal-titulo">📅 Agendar aula</div>
+        <div style="font-size:1.25rem;font-weight:900;margin-bottom:14px;display:flex;align-items:center;gap:10px;">📅 Agendar aula</div>
         <div class="resumo-aula">
           <div class="linha"><span>Evento</span><b>${esc(cfg.aula.nome || 'Aula')}</b></div>
           <div class="linha"><span>Data</span><b>${esc(cfg.aula.data ? fmtDataISO(cfg.aula.data) : '')}</b></div>
@@ -733,14 +516,8 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
           <div class="linha"><span>Valor</span><b>${esc(fmtValor(valor))}</b></div>
         </div>
         <form id="formReserva" onsubmit="event.preventDefault(); criarReserva();">
-          <div class="campo">
-            <label>Nome completo</label>
-            <input type="text" id="nomeReserva" required />
-          </div>
-          <div class="campo">
-            <label>WhatsApp (com DDD)</label>
-            <input type="tel" id="whatsappReserva" required placeholder="5511999999999" />
-          </div>
+          <div class="campo"><label>Nome completo</label><input type="text" id="nomeReserva" required /></div>
+          <div class="campo"><label>WhatsApp (com DDD)</label><input type="tel" id="whatsappReserva" required placeholder="5511999999999" /></div>
           ${cfg.aula.mostrarEmail ? `<div class="campo"><label>E-mail${cfg.aula.emailObrigatorio ? ' *' : ''}</label><input type="email" id="emailReserva" ${cfg.aula.emailObrigatorio ? 'required' : ''} /></div>` : ''}
           ${cfg.aula.mostrarObservacao ? `<div class="campo"><label>Observação${cfg.aula.observacaoObrigatoria ? ' *' : ''}</label><textarea id="obsReserva" ${cfg.aula.observacaoObrigatoria ? 'required' : ''}></textarea></div>` : ''}
           <button class="btn btn-primario btn-bloqueado" type="submit">CONFIRMAR RESERVA</button>
@@ -750,43 +527,20 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
       document.getElementById('modalAgendar').classList.add('aberto');
     }
 
-    function fecharModal() {
-      document.getElementById('modalAgendar').classList.remove('aberto');
-      document.getElementById('modalConteudo').innerHTML = '';
-    }
+    function fecharModal() { document.getElementById('modalAgendar').classList.remove('aberto'); document.getElementById('modalConteudo').innerHTML = ''; }
 
     async function criarReserva() {
       const cfg = estado.config;
       const nome = document.getElementById('nomeReserva').value.trim();
-      const whatsapp = (document.getElementById('whatsappReserva') || {}).value?.trim();
+      const whatsapp = document.getElementById('whatsappReserva').value.trim();
       const email = (document.getElementById('emailReserva') || {}).value?.trim() || '';
       const observacao = (document.getElementById('obsReserva') || {}).value?.trim() || '';
 
-      if (!nome || !whatsapp) {
-        showToast('Nome e WhatsApp são obrigatórios.', 'erro');
-        return;
-      }
-
-      if (cfg.aula.mostrarEmail && cfg.aula.emailObrigatorio && !email) {
-        showToast('E-mail é obrigatório.', 'erro');
-        return;
-      }
-
-      if (cfg.aula.mostrarObservacao && cfg.aula.observacaoObrigatoria && !observacao) {
-        showToast('Observação é obrigatória.', 'erro');
-        return;
-      }
-
-      const result = podeAgendar();
-      if (!result.ok) {
-        showToast(result.motivo, 'erro');
-        return;
-      }
-
-      if (!CONFIGURADO || !supabase) {
-        showToast('Configure o Supabase para persistir reservas.', 'erro');
-        return;
-      }
+      if (!nome || !whatsapp) { showToast('Nome e WhatsApp são obrigatórios.', 'erro'); return; }
+      if (cfg.aula.mostrarEmail && cfg.aula.emailObrigatorio && !email) { showToast('E-mail é obrigatório.', 'erro'); return; }
+      if (cfg.aula.mostrarObservacao && cfg.aula.observacaoObrigatoria && !observacao) { showToast('Observação é obrigatória.', 'erro'); return; }
+      const result = podeAgendar(); if (!result.ok) { showToast(result.motivo, 'erro'); return; }
+      if (!CONFIGURADO || !supabase) { showToast('Configure o Supabase para persistir reservas.', 'erro'); return; }
 
       const id = gerarIdReserva();
       const valor = cfg.aula.preco || cfg.pagamento.valor || '0';
@@ -805,26 +559,25 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
         link_cancelar: `${linkBase()}?cancel=${encodeURIComponent(id)}`
       };
 
-      const { error } = await supabase.from('reservas').insert(payload);
-      if (error) {
+      try {
+        const { error } = await supabase.from('reservas').insert(payload);
+        if (error) throw error;
+        fecharModal();
+        await loadReservas();
+        renderPublico();
+        if (document.getElementById('viewAdm').classList.contains('hidden') === false) renderAdm();
+        showSuccessModal(payload);
+      } catch (err) {
+        console.error(err);
         showToast('Erro ao registrar reserva.', 'erro');
-        console.error(error);
-        return;
       }
-
-      fecharModal();
-      await loadReservas();
-      await renderAdm();
-      renderPublico();
-      showSuccessModal(payload);
     }
 
     function showSuccessModal(reserva) {
-      const cfg = estado.config;
-      const valor = fmtValor(reserva.valor);
+      const cfg = estado.config; const valor = fmtValor(reserva.valor);
       const html = `
-        <div class="tela-sucesso">
-          <div class="check">✓</div>
+        <div style="text-align:center;">
+          <div style="width:72px;height:72px;border-radius:50%;background:var(--verde);color:#fff;font-size:2.2rem;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">✓</div>
           <h2 style="margin:0 0 10px;">Reserva confirmada!</h2>
           <p style="margin:0 0 18px; color:#444;">Sua vaga foi registrada com sucesso.</p>
           <div class="dados-reserva">
@@ -847,109 +600,63 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
       `;
       document.getElementById('modalConteudo').innerHTML = html;
       document.getElementById('modalAgendar').classList.add('aberto');
-
       if (cfg.pagamento.ativo && cfg.pagamento.chavePix) {
-        const pixText = `00020101021226850014BR.GOV.BCB.PIX...`;
         try {
-          new QRCode(document.getElementById('qrPix'), {
-            text: pixText,
-            width: 180,
-            height: 180,
-            colorDark: '#000000',
-            colorLight: '#ffffff'
-          });
-        } catch (e) {
-          document.getElementById('qrPix').innerHTML = '<div style="color:#666;">QR Code indisponível.</div>';
-        }
+          new QRCode(document.getElementById('qrPix'), { text: cfg.pagamento.chavePix || '', width: 180, height: 180, colorDark: '#000000', colorLight: '#ffffff' });
+        } catch (e) { document.getElementById('qrPix').innerHTML = '<div style="color:#666;">QR Code indisponível.</div>'; }
       }
     }
 
     function copiarPix() {
-      const cfg = estado.config;
-      const text = cfg.pagamento.chavePix || '';
-      if (!text) {
-        showToast('Chave PIX não cadastrada.', 'erro');
-        return;
-      }
+      const text = estado.config.pagamento.chavePix || '';
+      if (!text) { showToast('Chave PIX não cadastrada.', 'erro'); return; }
       navigator.clipboard.writeText(text).then(() => showToast('Chave PIX copiada.', 'sucesso')).catch(() => showToast('Não foi possível copiar automaticamente.', 'erro'));
     }
 
     async function loadConfig() {
-      if (!CONFIGURADO || !supabase) {
-        estado.config = deepClone(defaultConfig);
-        renderPublico();
-        return;
-      }
-
+      if (!CONFIGURADO || !supabase) { estado.config = deepClone(defaultConfig); renderPublico(); return; }
       const { data, error } = await supabase.from('app_config').select('*').eq('id', 1).maybeSingle();
-      if (error) {
-        console.error(error);
-        estado.config = deepClone(defaultConfig);
-        return;
-      }
-
-      if (data && data.settings) {
-        estado.config = merge(defaultConfig, data.settings);
-      } else {
-        await supabase.from('app_config').upsert({ id: 1, settings: deepClone(defaultConfig) }, { onConflict: 'id' });
+      if (error) { console.error(error); estado.config = deepClone(defaultConfig); return; }
+      if (data && data.settings) estado.config = merge(defaultConfig, data.settings); else {
+        await supabase.from('app_config').upsert({ id:1, settings: deepClone(defaultConfig) }, { onConflict: 'id' });
         estado.config = deepClone(defaultConfig);
       }
-
       renderPublico();
-      if (isLoggedIn()) renderAdm();
+      if (supabase && supabase.auth) {
+        const { data: sess } = await supabase.auth.getSession();
+        if (sess?.session) renderAdm();
+      }
     }
 
     async function loadReservas() {
-      if (!CONFIGURADO || !supabase) {
-        estado.reservas = [];
-        return;
-      }
-
+      if (!CONFIGURADO || !supabase) { estado.reservas = []; return; }
       const { data, error } = await supabase.from('reservas').select('*').order('created_at', { ascending: false });
-      if (error) {
-        console.error(error);
-        estado.reservas = [];
-        return;
-      }
+      if (error) { console.error(error); estado.reservas = []; return; }
       estado.reservas = data || [];
     }
 
     async function saveConfig() {
-      if (!CONFIGURADO || !supabase) {
-        showToast('Configure o Supabase para salvar as configurações.', 'erro');
-        return;
-      }
-
-      const { error } = await supabase.from('app_config').upsert({ id: 1, settings: estado.config }, { onConflict: 'id' });
-      if (error) {
-        console.error(error);
-        showToast('Erro ao salvar configuração.', 'erro');
-        return;
-      }
+      if (!CONFIGURADO || !supabase) { showToast('Configure o Supabase para salvar as configurações.', 'erro'); return; }
+      const { error } = await supabase.from('app_config').upsert({ id:1, settings: estado.config }, { onConflict: 'id' });
+      if (error) { console.error(error); showToast('Erro ao salvar configuração.', 'erro'); return; }
       showToast('Configuração salva com sucesso.', 'sucesso');
       renderPublico();
     }
 
     function renderAdm() {
-      if (!document.getElementById('viewAdm').classList.contains('hidden')) {
-        bindConfigFields();
-        renderDashboard();
-        renderReservas();
-        atualizarDiaSemana();
-      }
+      if (document.getElementById('viewAdm').classList.contains('hidden')) return;
+      bindConfigFields();
+      renderDashboard();
+      renderReservas();
+      atualizarDiaSemana();
     }
 
     function bindConfigFields() {
       document.querySelectorAll('[data-cfg]').forEach(input => {
         const path = input.dataset.cfg;
         const value = getValueByPath(estado.config, path);
-        if (input.type === 'date' || input.type === 'time') {
-          input.value = value || '';
-        } else {
-          input.value = value ?? '';
-        }
+        input.value = input.type === 'date' || input.type === 'time' ? (value || '') : (value ?? '');
       });
-
       document.querySelectorAll('[data-cfg-switch]').forEach(input => {
         const path = input.dataset.cfgSwitch;
         const value = getValueByPath(estado.config, path);
@@ -957,25 +664,17 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
       });
     }
 
-    function getValueByPath(obj, path) {
-      return path.split('.').reduce((acc, part) => acc && acc[part], obj);
-    }
-
-    function setValueByPath(obj, path, value) {
-      const keys = path.split('.');
-      const last = keys.pop();
-      const target = keys.reduce((acc, k) => acc[k], obj);
-      target[last] = value;
-    }
+    function getValueByPath(obj, path) { return path.split('.').reduce((acc, part) => acc && acc[part], obj); }
+    function setValueByPath(obj, path, value) { const keys = path.split('.'); const last = keys.pop(); const target = keys.reduce((acc, k) => acc[k], obj); target[last] = value; }
 
     document.addEventListener('input', async (event) => {
       const target = event.target;
       if (!target.matches('[data-cfg]')) return;
       const path = target.dataset.cfg;
-      const value = target.type === 'number' ? target.value : target.value;
-      setValueByPath(estado.config, path, value);
-      if (CONFIGURADO && supabase && isLoggedIn()) {
-        await saveConfig();
+      setValueByPath(estado.config, path, target.value);
+      if (CONFIGURADO && supabase) {
+        const { data } = await supabase.auth.getSession();
+        if (data?.session) await saveConfig();
       }
       renderPublico();
       atualizarDiaSemana();
@@ -984,31 +683,38 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
     document.addEventListener('change', async (event) => {
       const target = event.target;
       if (target.matches('[data-cfg-switch]')) {
-        const path = target.dataset.cfgSwitch;
-        setValueByPath(estado.config, path, target.checked);
-        if (CONFIGURADO && supabase && isLoggedIn()) {
-          await saveConfig();
+        setValueByPath(estado.config, target.dataset.cfgSwitch, target.checked);
+        if (CONFIGURADO && supabase) {
+          const { data } = await supabase.auth.getSession();
+          if (data?.session) await saveConfig();
         }
-        renderPublico();
       }
       if (target.matches('[data-cfg]')) {
-        const path = target.dataset.cfg;
-        setValueByPath(estado.config, path, target.value);
-        if (CONFIGURADO && supabase && isLoggedIn()) {
-          await saveConfig();
+        setValueByPath(estado.config, target.dataset.cfg, target.value);
+        if (CONFIGURADO && supabase) {
+          const { data } = await supabase.auth.getSession();
+          if (data?.session) await saveConfig();
         }
       }
+      renderPublico();
     });
+
+    function abrirSec(sec, btn) {
+      document.querySelectorAll('.sec-adm').forEach(el => el.classList.remove('ativo'));
+      document.getElementById('sec-' + sec)?.classList.add('ativo');
+      document.querySelectorAll('#admMenu button').forEach(el => el.classList.remove('ativo'));
+      if (btn) btn.classList.add('ativo');
+    }
 
     function renderDashboard() {
       const total = estado.reservas.length;
       const pendentes = estado.reservas.filter(r => r.status === 'pendente').length;
       const pagos = estado.reservas.filter(r => r.status === 'pago').length;
       const cancelados = estado.reservas.filter(r => r.status === 'cancelado').length;
-      const cards = `
+      document.getElementById('kpiCards').innerHTML = `
         <div class="bloco-adm" style="margin-bottom:18px;">
           <h3>📊 Estatísticas</h3>
-          <div class="grade-cards" style="display:grid; grid-template-columns:repeat(2,1fr); gap:14px;">
+          <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:14px;">
             <div class="card" style="background:var(--cinza-900); color:#fff; border-color:var(--cinza-700);">
               <div style="font-size:.72rem; letter-spacing:.8px; text-transform:uppercase; color:#aaa;">Total</div>
               <div style="font-size:1.7rem; font-weight:900; margin-top:6px; color:var(--laranja);">${total}</div>
@@ -1028,14 +734,9 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
           </div>
         </div>
       `;
-      document.getElementById('kpiCards').innerHTML = cards;
 
       const proxima = document.getElementById('proximaAula');
-      if (!estado.config.aula.data) {
-        proxima.innerHTML = '<p style="margin:0; color:#aaa;">Nenhuma aula cadastrada ainda.</p>';
-        return;
-      }
-
+      if (!estado.config.aula.data) { proxima.innerHTML = '<p style="margin:0; color:#aaa;">Nenhuma aula cadastrada ainda.</p>'; return; }
       const disp = vagasDisponiveis();
       const status = aulaLotada() ? '<span class="badge badge-lotada">Lotada</span>' : '<span class="badge badge-ultima">Disponível</span>';
       proxima.innerHTML = `
@@ -1053,68 +754,43 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
     function atualizarDiaSemana() {
       const el = document.getElementById('diaSemanaInfo');
       if (!el) return;
-      if (!estado.config.aula.data) {
-        el.value = '';
-        return;
-      }
+      if (!estado.config.aula.data) { el.value = ''; return; }
       const d = new Date(estado.config.aula.data + 'T12:00:00');
       const dias = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
       el.value = dias[d.getDay()];
     }
 
     function renderReservas() {
-      const tbody = document.getElementById('tbodyReservas');
-      if (!tbody) return;
-
-      const termo = document.getElementById('buscaReservas')?.value?.toLowerCase() || '';
+      const tbody = document.getElementById('tbodyReservas'); if (!tbody) return;
+      const termo = (document.getElementById('buscaReservas')?.value || '').toLowerCase();
       const filtradas = estado.reservas.filter(r => {
         if (!termo) return true;
         const texto = `${r.nome || ''} ${r.whatsapp || ''} ${r.email || ''}`.toLowerCase();
         return texto.includes(termo);
       });
-
-      if (!filtradas.length) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#888; padding:24px;">Nenhuma reserva encontrada.</td></tr>';
-        return;
-      }
-
+      if (!filtradas.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#888; padding:24px;">Nenhuma reserva encontrada.</td></tr>'; return; }
       tbody.innerHTML = filtradas.map(r => `
         <tr>
-          <td><span class="reserva-id">${esc(r.id)}</span></td>
-          <td>
-            <div class="reserva-nome">${esc(r.nome || '—')}</div>
-            <div class="reserva-sub">${esc(r.aula_nome || estado.config.aula.nome || 'Aula')}</div>
-          </td>
+          <td><span style="font-weight:800; color:var(--laranja); font-size:.82rem;">${esc(r.id)}</span></td>
+          <td><div style="font-weight:700;">${esc(r.nome || '—')}</div><div style="font-size:.75rem; color:#888;">${esc(r.aula_nome || estado.config.aula.nome || 'Aula')}</div></td>
           <td>${esc(r.whatsapp || '—')}</td>
           <td>${esc(r.email || '—')}</td>
-          <td>${esc((r.aula_data ? fmtDataCurta(r.aula_data) : '') || '—')}</td>
+          <td>${esc(r.aula_data ? fmtDataCurta(r.aula_data) : '—')}</td>
           <td>${esc(fmtValor(r.valor || 0))}</td>
-          <td>
-            <select class="status-select" data-status-id="${esc(r.id)}" onchange="alterarStatusReserva(this)">
-              <option value="pendente" ${r.status === 'pendente' ? 'selected' : ''}>Pendente</option>
-              <option value="pago" ${r.status === 'pago' ? 'selected' : ''}>Pago</option>
-              <option value="cancelado" ${r.status === 'cancelado' ? 'selected' : ''}>Cancelado</option>
-            </select>
-          </td>
-          <td>
-            <div class="acoes-reserva">
-              <button class="btn btn-pequeno btn-contorno" onclick="enviarMensagemReserva('${esc(r.id)}')">WhatsApp</button>
-              <button class="btn btn-pequeno btn-perigo" onclick="removerReserva('${esc(r.id)}')">Excluir</button>
-            </div>
-          </td>
+          <td><select class="status-select" data-status-id="${esc(r.id)}" onchange="alterarStatusReserva(this)">
+            <option value="pendente" ${r.status === 'pendente' ? 'selected' : ''}>Pendente</option>
+            <option value="pago" ${r.status === 'pago' ? 'selected' : ''}>Pago</option>
+            <option value="cancelado" ${r.status === 'cancelado' ? 'selected' : ''}>Cancelado</option>
+          </select></td>
+          <td><div style="display:flex; gap:6px; flex-wrap:wrap;"><button class="btn btn-pequeno btn-contorno" onclick="enviarMensagemReserva('${esc(r.id)}')">WhatsApp</button><button class="btn btn-pequeno btn-perigo" onclick="removerReserva('${esc(r.id)}')">Excluir</button></div></td>
         </tr>
       `).join('');
     }
 
     async function alterarStatusReserva(select) {
-      const id = select.getAttribute('data-status-id');
-      const status = select.value;
-      if (!CONFIGURADO || !supabase) return;
+      const id = select.getAttribute('data-status-id'); const status = select.value; if (!supabase) return;
       const { error } = await supabase.from('reservas').update({ status }).eq('id', id);
-      if (error) {
-        showToast('Erro ao atualizar status.', 'erro');
-        return;
-      }
+      if (error) { showToast('Erro ao atualizar status.', 'erro'); return; }
       await loadReservas();
       renderReservas();
       renderPublico();
@@ -1122,12 +798,9 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
     }
 
     async function removerReserva(id) {
-      if (!CONFIGURADO || !supabase) return;
+      if (!supabase) return;
       const { error } = await supabase.from('reservas').delete().eq('id', id);
-      if (error) {
-        showToast('Erro ao remover reserva.', 'erro');
-        return;
-      }
+      if (error) { showToast('Erro ao remover reserva.', 'erro'); return; }
       await loadReservas();
       renderReservas();
       renderPublico();
@@ -1135,8 +808,7 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
     }
 
     function enviarMensagemReserva(id) {
-      const reserva = estado.reservas.find(r => r.id === id);
-      if (!reserva) return;
+      const reserva = estado.reservas.find(r => r.id === id); if (!reserva) return;
       const cfg = estado.config;
       const msg = cfg.comunicacao.msgConfirmacao
         .replace('[NOME]', reserva.nome || 'Aluno')
@@ -1146,81 +818,50 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
         .replace('[VALOR]', fmtValor(reserva.valor || cfg.aula.preco || cfg.pagamento.valor || 0))
         .replace('[ID]', reserva.id)
         .replace('[LINK_CANCELAR]', reserva.link_cancelar || '');
-      const url = 'https://wa.me/' + cfg.comunicacao.whatsapp + '?text=' + encodeURIComponent(msg);
-      window.open(url, '_blank');
+      window.open('https://wa.me/' + cfg.comunicacao.whatsapp + '?text=' + encodeURIComponent(msg), '_blank');
     }
 
     function fazerBackup() {
-      const payload = {
-        exportedAt: new Date().toISOString(),
-        config: estado.config,
-        reservas: estado.reservas
-      };
+      const payload = { exportedAt: new Date().toISOString(), config: estado.config, reservas: estado.reservas };
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'backup-agendamento.json';
-      link.click();
-      URL.revokeObjectURL(link.href);
+      const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'backup-agendamento.json'; link.click(); URL.revokeObjectURL(link.href);
       showToast('Backup gerado.', 'sucesso');
     }
 
     async function restaurarBackup() {
       const text = document.getElementById('restoreJson').value.trim();
-      if (!text) {
-        showToast('Cole um JSON de backup antes de restaurar.', 'erro');
-        return;
-      }
+      if (!text) { showToast('Cole um JSON de backup antes de restaurar.', 'erro'); return; }
       try {
         const data = JSON.parse(text);
         if (data.config) estado.config = merge(defaultConfig, data.config);
-        if (Array.isArray(data.reservas)) {
-          estado.reservas = data.reservas;
-          if (CONFIGURADO && supabase && isLoggedIn()) {
-            await Promise.all(data.reservas.map(r => supabase.from('reservas').upsert(r, { onConflict: 'id' })));
-          }
+        if (Array.isArray(data.reservas)) estado.reservas = data.reservas;
+        if (CONFIGURADO && supabase) {
+          await supabase.from('app_config').upsert({ id:1, settings: estado.config }, { onConflict: 'id' });
+          for (const r of estado.reservas) await supabase.from('reservas').upsert(r, { onConflict: 'id' });
         }
-        if (CONFIGURADO && supabase && isLoggedIn()) {
-          await saveConfig();
-        }
+        document.getElementById('restoreJson').value = '';
         renderPublico();
         renderAdm();
-        document.getElementById('restoreJson').value = '';
         showToast('Backup restaurado.', 'sucesso');
       } catch (e) {
-        console.error(e);
-        showToast('JSON inválido.', 'erro');
+        console.error(e); showToast('JSON inválido.', 'erro');
       }
     }
 
     async function init() {
-      if (!CONFIGURADO) {
-        showToast('Configure as variáveis do Supabase antes de publicar.', 'erro');
-      }
-
-      if (window.location.search.includes('cancel=')) {
-        const id = new URLSearchParams(window.location.search).get('cancel');
-        if (id && CONFIGURADO && supabase) {
-          await supabase.from('reservas').update({ status: 'cancelado' }).eq('id', id);
-          showToast('Reserva cancelada.', 'sucesso');
-        }
-      }
-
       if (CONFIGURADO && supabase) {
-        const { data: sessionData } = await supabase.auth.getSession();
-        if (sessionData?.session) {
-          mostrarPainelAdm();
-        }
+        const { data } = await supabase.auth.getSession();
+        if (data?.session) mostrarPainelAdm();
       }
-
       await loadConfig();
       await loadReservas();
       renderPublico();
-      if (isLoggedIn()) renderAdm();
-
       const hash = location.hash;
       if (hash === '#/adm') {
-        if (isLoggedIn()) mostrarPainelAdm(); else irPara('adm');
+        if (CONFIGURADO && supabase) {
+          const { data } = await supabase.auth.getSession();
+          if (data?.session) mostrarPainelAdm(); else abrirLoginAdm();
+        } else abrirLoginAdm();
       }
     }
 
