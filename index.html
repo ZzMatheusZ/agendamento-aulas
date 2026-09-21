@@ -1,338 +1,41 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Agendamento de Aulas Funcionais</title>
-  <meta name="description" content="Agende sua vaga na aula de treinamento funcional do fim de semana. Vagas limitadas, pagamento via PIX.">
-  <meta property="og:title" content="Agendamento de Aulas Funcionais">
-  <meta property="og:description" content="Agende sua vaga na aula do fim de semana. Vagas limitadas, pagamento via PIX.">
-  <meta property="og:type" content="website">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230c0c0c'/><text x='50' y='68' font-size='52' text-anchor='middle'>🏋️</text></svg>">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <meta name="description" content="Agende sua vaga na aula de treinamento funcional do fim de semana." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <style>
     :root{
-      --laranja:#f97316;
-      --laranja-escuro:#ea580c;
-      --preto:#0c0c0c;
-      --cinza-900:#171717;
-      --cinza-800:#1f1f1f;
-      --cinza-700:#2a2a2a;
-      --cinza-200:#e5e5e5;
-      --cinza-100:#f5f5f5;
-      --branco:#ffffff;
-      --verde:#22c55e;
-      --vermelho:#ef4444;
-      --amarelo:#f59e0b;
-      --raio:16px;
-      --sombra:0 4px 20px rgba(0,0,0,.08);
-      --sombra-forte:0 8px 30px rgba(0,0,0,.16);
+      --laranja:#f97316; --laranja-escuro:#ea580c; --preto:#0c0c0c; --cinza-900:#171717; --cinza-800:#1f1f1f; --cinza-700:#2a2a2a; --cinza-200:#e5e5e5; --cinza-100:#f5f5f5; --branco:#fff; --verde:#22c55e; --vermelho:#ef4444; --amarelo:#f59e0b; --raio:16px; --sombra:0 4px 20px rgba(0,0,0,.08); --sombra-forte:0 8px 30px rgba(0,0,0,.16);
     }
-    *{margin:0;padding:0;box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      font-family:'Inter',system-ui,-apple-system,sans-serif;
-      background:var(--branco);
-      color:var(--preto);
-      line-height:1.5;
-      -webkit-font-smoothing:antialiased;
-    }
-    button{font-family:inherit;cursor:pointer;border:none;background:none}
-    input,select,textarea{font-family:inherit;font-size:16px}
-    .hidden{display:none!important}
-    .nav{
-      position:sticky;top:0;z-index:50;
-      background:var(--preto);color:var(--branco);
-      padding:14px 20px;
-      display:flex;align-items:center;justify-content:space-between;gap:12px;
-      box-shadow:0 2px 12px rgba(0,0,0,.25);
-    }
-    .nav-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem;letter-spacing:.3px}
-    .nav-brand .logo{
-      width:38px;height:38px;border-radius:12px;background:var(--laranja);
-      display:flex;align-items:center;justify-content:center;font-size:1.2rem;
-    }
-    .nav-acoes{display:flex;gap:8px}
-    .btn-nav{
-      padding:10px 16px;border-radius:12px;font-weight:700;font-size:.9rem;
-      color:var(--branco);transition:.2s;white-space:nowrap;
-    }
-    .btn-nav.ativo{background:var(--laranja)}
-    .btn-nav:not(.ativo):hover{background:var(--cinza-700)}
-    .container{max-width:960px;margin:0 auto;padding:24px 16px 60px}
-    .container-largo{max-width:1200px;margin:0 auto;padding:24px 16px 60px}
-    .btn{
-      display:inline-flex;align-items:center;justify-content:center;gap:8px;
-      padding:14px 24px;border-radius:14px;font-weight:800;font-size:1rem;
-      transition:.2s;border:2px solid transparent;
-    }
-    .btn-primario{background:var(--laranja);color:var(--branco)}
-    .btn-primario:hover{background:var(--laranja-escuro);transform:translateY(-1px)}
-    .btn-primario:disabled{background:var(--cinza-200);color:#888;cursor:not-allowed;transform:none}
-    .btn-secundario{background:var(--preto);color:var(--branco)}
-    .btn-secundario:hover{background:var(--cinza-800)}
-    .btn-contorno{border-color:var(--preto);color:var(--preto);background:transparent}
-    .btn-contorno:hover{background:var(--cinza-100)}
-    .btn-perigo{background:var(--vermelho);color:var(--branco)}
-    .btn-perigo:hover{opacity:.9}
-    .btn-sucesso{background:var(--verde);color:var(--branco)}
-    .btn-sucesso:hover{opacity:.9}
-    .btn-pequeno{padding:8px 12px;font-size:.82rem;border-radius:10px;font-weight:700}
-    .btn-bloqueado{width:100%}
-    .card{
-      background:var(--branco);border-radius:var(--raio);
-      box-shadow:var(--sombra);padding:24px;border:1px solid var(--cinza-200);
-    }
-    .vazio{text-align:center;padding:60px 20px;color:#777}
-    .vazio .icone{font-size:3rem;margin-bottom:12px}
-    .vazio h3{color:var(--preto);margin-bottom:6px;font-size:1.2rem}
-    .vazio p{max-width:420px;margin:0 auto}
-    .aula-destaque{
-      background:linear-gradient(135deg,var(--preto) 0%,var(--cinza-900) 100%);
-      color:var(--branco);border-radius:24px;padding:32px 24px;
-      box-shadow:var(--sombra-forte);position:relative;overflow:hidden;
-    }
-    .aula-destaque::before{
-      content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;
-      background:radial-gradient(circle,rgba(249,115,22,.35),transparent 70%);
-    }
-    .aula-etiqueta{
-      display:inline-block;background:var(--laranja);color:var(--branco);
-      font-size:.75rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;
-      padding:6px 14px;border-radius:999px;margin-bottom:16px;
-    }
-    .aula-titulo{font-size:2rem;font-weight:900;line-height:1.15;margin-bottom:8px}
-    .aula-descricao{color:#c9c9c9;margin-bottom:20px;max-width:560px}
-    .aula-info{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:24px}
-    .aula-info-item{
-      display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:12px 16px;
-    }
-    .aula-info-item .ic{font-size:1.3rem}
-    .aula-info-item .rotulo{font-size:.72rem;text-transform:uppercase;letter-spacing:.8px;color:#aaa;font-weight:700}
-    .aula-info-item .valor{font-weight:800;font-size:1.05rem}
-    .badge{
-      display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;
-      font-size:.75rem;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
-    }
-    .badge-lotada{background:var(--vermelho);color:var(--branco)}
-    .badge-ultima{background:var(--amarelo);color:var(--preto)}
-    .badge-fechada{background:var(--cinza-700);color:var(--branco)}
-    .badge-pendente{background:#fef3c7;color:#92400e}
-    .badge-pago{background:#dcfce7;color:#166534}
-    .badge-cancelado{background:#fee2e2;color:#991b1b}
-    .badge-espera{background:#e0e7ff;color:#3730a3}
-    .banner{
-      background:var(--amarelo);color:var(--preto);border-radius:14px;
-      padding:14px 18px;font-weight:700;margin-bottom:20px;display:flex;gap:10px;align-items:center;
-    }
-    .banner-vermelho{background:var(--vermelho);color:var(--branco)}
-    .banner-cinza{background:var(--cinza-100);color:var(--preto)}
-    .hint-falta{
-      display:none;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.4);
-      color:#fdba74;border-radius:12px;padding:12px 16px;font-weight:600;font-size:.85rem;margin-bottom:16px;
-    }
-    .item-falta{
-      display:block;width:100%;text-align:left;background:var(--cinza-800);color:var(--branco);
-      border:1px solid rgba(249,115,22,.35);border-radius:10px;padding:10px 14px;margin-bottom:6px;
-      font-weight:600;font-size:.85rem;transition:.2s;
-    }
-    .item-falta:hover{border-color:var(--laranja)}
-    .campo{margin-bottom:16px}
-    .campo label{display:block;font-weight:700;font-size:.88rem;margin-bottom:6px}
-    .campo input,.campo select,.campo textarea{
-      width:100%;padding:13px 14px;border-radius:12px;
-      border:2px solid var(--cinza-200);background:var(--branco);
-      transition:.2s;color:var(--preto);
-    }
-    .campo input:focus,.campo select:focus,.campo textarea:focus{
-      outline:none;border-color:var(--laranja);box-shadow:0 0 0 3px rgba(249,115,22,.15);
-    }
-    .campo textarea{min-height:90px;resize:vertical}
-    .campo .ajuda{font-size:.78rem;color:#888;margin-top:4px}
-    .campo-escuro label{color:var(--branco)}
-    .campo-escuro input,.campo-escuro select,.campo-escuro textarea{
-      background:var(--cinza-800);border-color:var(--cinza-700);color:var(--branco);
-    }
-    .campo-escuro input::placeholder,.campo-escuro textarea::placeholder{color:#777}
-    .switch-linha{
-      display:flex;align-items:center;justify-content:space-between;gap:14px;
-      background:var(--cinza-100);border-radius:12px;padding:12px 16px;margin-bottom:10px;
-    }
-    .campo-escuro .switch-linha{background:var(--cinza-800)}
-    .switch-linha .txt{font-weight:600;font-size:.9rem}
-    .switch-linha .sub{font-size:.75rem;color:#888;display:block}
-    .switch{position:relative;width:46px;height:26px;flex-shrink:0}
-    .switch input{opacity:0;width:0;height:0}
-    .slider{
-      position:absolute;inset:0;background:var(--cinza-200);border-radius:999px;transition:.25s;
-    }
-    .slider::before{
-      content:'';position:absolute;width:20px;height:20px;border-radius:50%;
-      background:var(--branco);top:3px;left:3px;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.3);
-    }
-    .switch input:checked + .slider{background:var(--laranja)}
-    .switch input:checked + .slider::before{transform:translateX(20px)}
-    .switch-linha.laranja-preto{
-      background:var(--preto);
-      border:1px solid rgba(249,115,22,.45);
-      border-left:4px solid var(--laranja);
-    }
-    .switch-linha.laranja-preto .txt{color:var(--branco);font-weight:700}
-    .switch-linha.laranja-preto .sub{color:#fdba74}
-    .switch-linha.laranja-preto .slider{
-      background:var(--cinza-800);
-      border:2px solid var(--laranja);
-    }
-    .switch-linha.laranja-preto .slider::before{background:var(--laranja)}
-    .switch-linha.laranja-preto .switch input:checked + .slider{
-      background:var(--laranja);
-      border-color:var(--laranja);
-    }
-    .switch-linha.laranja-preto .switch input:checked + .slider::before{background:var(--preto)}
-    .login-wrap{max-width:420px;margin:60px auto;padding:0 16px}
-    .login-card{
-      background:var(--preto);color:var(--branco);border-radius:24px;padding:36px 28px;
-      box-shadow:var(--sombra-forte);text-align:center;
-    }
-    .login-card .icone{font-size:2.6rem;margin-bottom:10px}
-    .login-card h2{font-size:1.5rem;margin-bottom:4px}
-    .login-card p{color:#aaa;font-size:.9rem;margin-bottom:24px}
-    .adm-topo{
-      background:var(--preto);color:var(--branco);
-      padding:16px 20px;display:flex;align-items:center;justify-content:space-between;
-      position:sticky;top:0;z-index:40;
-    }
-    .adm-topo h1{font-size:1.1rem;font-weight:800;display:flex;align-items:center;gap:10px}
-    .adm-wrap{display:grid;grid-template-columns:1fr;gap:20px;padding:20px 16px 60px;max-width:1200px;margin:0 auto}
-    .adm-menu{
-      display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;
-      scrollbar-width:none;
-    }
-    .adm-menu::-webkit-scrollbar{display:none}
-    .adm-menu button{
-      flex-shrink:0;padding:11px 16px;border-radius:12px;font-weight:700;font-size:.88rem;
-      background:var(--cinza-100);color:var(--preto);transition:.2s;white-space:nowrap;
-    }
-    .adm-menu button.ativo{background:var(--laranja);color:var(--branco)}
-    .adm-conteudo{min-width:0}
-    .sec-adm{display:none}
-    .sec-adm.ativo{display:block}
-    .sec-titulo{font-size:1.3rem;font-weight:900;margin-bottom:4px}
-    .sec-sub{color:#777;font-size:.9rem;margin-bottom:20px}
-    .grade-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:20px}
-    .kpi{
-      background:var(--cinza-900);color:var(--branco);
-      border-radius:var(--raio);padding:18px;border:1px solid var(--cinza-700);
-    }
-    .kpi .rotulo{font-size:.72rem;text-transform:uppercase;letter-spacing:.8px;color:#aaa;font-weight:700}
-    .kpi .numero{font-size:1.7rem;font-weight:900;margin-top:4px}
-    .kpi .numero.laranja{color:var(--laranja)}
-    .kpi .numero.verde{color:var(--verde)}
-    .kpi .numero.vermelho{color:var(--vermelho)}
-    .kpi .numero.amarelo{color:var(--amarelo)}
-    .bloco-adm{background:var(--cinza-900);color:var(--branco);border-radius:var(--raio);padding:22px;margin-bottom:16px;border:1px solid var(--cinza-700)}
-    .bloco-adm h3{font-size:1.05rem;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-    .bloco-adm h4{font-size:.95rem;font-weight:700;margin:18px 0 10px;color:var(--laranja)}
-    .grade-campos{display:grid;grid-template-columns:1fr;gap:0 16px}
-    .tabela-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--cinza-700)}
-    table{width:100%;border-collapse:collapse;min-width:760px}
-    thead th{
-      background:var(--cinza-800);color:#bbb;text-align:left;
-      font-size:.72rem;text-transform:uppercase;letter-spacing:.8px;padding:12px 14px;white-space:nowrap;
-    }
-    tbody td{padding:12px 14px;border-top:1px solid var(--cinza-700);font-size:.9rem;vertical-align:middle}
-    tbody tr:hover{background:var(--cinza-800)}
-    .reserva-id{font-weight:800;color:var(--laranja);font-size:.82rem}
-    .reserva-nome{font-weight:700}
-    .reserva-sub{font-size:.75rem;color:#888}
-    .acoes-reserva{display:flex;gap:6px;flex-wrap:wrap}
-    select.status-select{
-      background:var(--cinza-800);color:var(--branco);border:1px solid var(--cinza-700);
-      border-radius:8px;padding:6px 8px;font-size:.8rem;font-weight:700;
-    }
-    .busca-adm{
-      width:100%;padding:13px 16px;border-radius:12px;border:2px solid var(--cinza-700);
-      background:var(--cinza-800);color:var(--branco);margin-bottom:14px;
-    }
-    .busca-adm:focus{outline:none;border-color:var(--laranja)}
-    .modal-fundo{
-      position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;
-      display:none;align-items:flex-end;justify-content:center;
-    }
-    .modal-fundo.aberto{display:flex}
-    .modal{
-      background:var(--branco);width:100%;max-width:520px;
-      border-radius:24px 24px 0 0;max-height:92vh;overflow-y:auto;
-      padding:26px 20px 30px;animation:subir .3s ease;
-    }
-    @keyframes subir{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
-    .modal-titulo{font-size:1.25rem;font-weight:900;margin-bottom:14px;display:flex;align-items:center;gap:10px}
-    .modal-fechar{
-      position:sticky;top:0;float:right;width:36px;height:36px;border-radius:50%;
-      background:var(--cinza-100);font-size:1.1rem;font-weight:800;color:var(--preto);
-    }
-    .resumo-aula{background:var(--cinza-100);border-radius:14px;padding:16px;margin-bottom:18px}
-    .resumo-aula .linha{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:.92rem}
-    .resumo-aula .linha b{text-align:right}
-    .tela-sucesso{text-align:center}
-    .tela-sucesso .check{
-      width:72px;height:72px;border-radius:50%;background:var(--verde);color:var(--branco);
-      font-size:2.2rem;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;
-    }
-    .dados-reserva{
-      background:var(--cinza-100);border-radius:14px;padding:16px;text-align:left;margin:18px 0;
-    }
-    .dados-reserva .linha{display:flex;justify-content:space-between;gap:10px;padding:6px 0;font-size:.92rem;border-bottom:1px dashed var(--cinza-200)}
-    .dados-reserva .linha:last-child{border-bottom:none}
-    .dados-reserva .linha b{text-align:right}
-    .bloco-pix{
-      background:var(--preto);color:var(--branco);border-radius:16px;padding:20px;margin-top:16px;text-align:left;
-    }
-    .bloco-pix h3{color:var(--laranja);font-size:1rem;margin-bottom:10px}
-    .bloco-pix .linha{display:flex;justify-content:space-between;gap:10px;padding:4px 0;font-size:.88rem}
-    .bloco-pix .linha b{text-align:right;word-break:break-all}
-    .chave-pix{
-      background:var(--cinza-800);border:1px dashed var(--laranja);border-radius:10px;
-      padding:10px 12px;font-size:.85rem;word-break:break-all;margin:12px 0;color:#ddd;
-    }
-    .pix-qr-box{
-      background:var(--branco);border-radius:12px;padding:14px;text-align:center;margin:12px 0;
-    }
-    .local-box{background:var(--cinza-100);border-radius:14px;padding:16px;margin-top:16px;text-align:left}
-    .local-box h3{font-size:1rem;margin-bottom:8px}
-    .local-box p{font-size:.9rem;color:#555;margin-bottom:4px}
-    .toasts{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;width:calc(100% - 32px);max-width:420px}
-    .toast{
-      background:var(--preto);color:var(--branco);border-radius:12px;padding:13px 18px;
-      font-weight:600;font-size:.9rem;box-shadow:var(--sombra-forte);
-      display:flex;align-items:center;gap:10px;animation:subir .25s ease;
-    }
-    .toast.erro{background:var(--vermelho)}
-    .toast.sucesso{background:var(--verde)}
-    @media(min-width:768px){
-      .aula-info{grid-template-columns:repeat(2,1fr)}
-      .grade-campos{grid-template-columns:repeat(2,1fr)}
-      .grade-campos .campo-largo{grid-column:1/-1}
-      .grade-cards{grid-template-columns:repeat(4,1fr)}
-      .adm-wrap{grid-template-columns:240px 1fr}
-      .adm-menu{flex-direction:column;overflow:visible;position:sticky;top:80px;align-self:start}
-      .adm-menu button{text-align:left}
-      .modal-fundo{align-items:center}
-      .modal{border-radius:24px}
-      .nav{padding:14px 32px}
-      .container{padding:40px 24px 80px}
-    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;font-family:'Inter',system-ui,-apple-system,sans-serif;background:#fff;color:var(--preto);line-height:1.5;-webkit-font-smoothing:antialiased} button{font-family:inherit;cursor:pointer;border:none;background:none} input,select,textarea{font-family:inherit;font-size:16px} .hidden{display:none!important}
+    .nav{position:sticky;top:0;z-index:50;background:var(--preto);color:#fff;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 20px;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+    .nav-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem;letter-spacing:.3px}.nav-brand .logo{width:38px;height:38px;border-radius:12px;background:var(--laranja);display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+    .nav-acoes{display:flex;gap:8px}.btn-nav{padding:10px 16px;border-radius:12px;font-weight:700;font-size:.9rem;color:#fff;transition:.2s;white-space:nowrap}.btn-nav.ativo{background:var(--laranja)}.btn-nav:not(.ativo):hover{background:var(--cinza-700)}
+    .container{max-width:960px;margin:0 auto;padding:24px 16px 60px}.container-largo{max-width:1200px;margin:0 auto;padding:24px 16px 60px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 24px;border-radius:14px;font-weight:800;font-size:1rem;transition:.2s;border:2px solid transparent;text-decoration:none}.btn-primario{background:var(--laranja);color:#fff}.btn-primario:hover{background:var(--laranja-escuro);transform:translateY(-1px)}.btn-primario:disabled{background:var(--cinza-200);color:#888;cursor:not-allowed;transform:none}.btn-secundario{background:var(--preto);color:#fff}.btn-secundario:hover{background:var(--cinza-800)}.btn-contorno{border-color:var(--preto);color:var(--preto);background:transparent}.btn-contorno:hover{background:var(--cinza-100)}.btn-perigo{background:var(--vermelho);color:#fff}.btn-perigo:hover{opacity:.9}.btn-sucesso{background:var(--verde);color:#fff}.btn-sucesso:hover{opacity:.9}.btn-pequeno{padding:8px 12px;font-size:.82rem;border-radius:10px;font-weight:700}.btn-bloqueado{width:100%}
+    .card{background:#fff;border-radius:var(--raio);box-shadow:var(--sombra);border:1px solid var(--cinza-200);padding:24px}.vazio{text-align:center;padding:60px 20px;color:#777}.vazio .icone{font-size:3rem;margin-bottom:12px}.vazio h3{color:var(--preto);margin-bottom:6px;font-size:1.2rem}.vazio p{max-width:420px;margin:0 auto}
+    .aula-destaque{background:linear-gradient(135deg,var(--preto) 0%,var(--cinza-900) 100%);color:#fff;border-radius:24px;padding:32px 24px;box-shadow:var(--sombra-forte);position:relative;overflow:hidden}.aula-destaque::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(249,115,22,.35),transparent 70%)}
+    .aula-etiqueta{display:inline-block;background:var(--laranja);color:#fff;font-size:.75rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:999px;margin-bottom:16px}.aula-titulo{font-size:2rem;font-weight:900;line-height:1.15;margin-bottom:8px}.aula-descricao{color:#c9c9c9;margin-bottom:20px;max-width:560px}.aula-info{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:24px}.aula-info-item{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:12px 16px}.aula-info-item .ic{font-size:1.3rem}.aula-info-item .rotulo{font-size:.72rem;text-transform:uppercase;letter-spacing:.8px;color:#aaa;font-weight:700}.aula-info-item .valor{font-weight:800;font-size:1.05rem}.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:.75rem;font-weight:800;letter-spacing:.5px;text-transform:uppercase}.badge-lotada{background:var(--vermelho);color:#fff}.badge-ultima{background:var(--amarelo);color:var(--preto)}.badge-fechada{background:var(--cinza-700);color:#fff}.badge-pendente{background:#fef3c7;color:#92400e}.badge-pago{background:#dcfce7;color:#166534}.badge-cancelado{background:#fee2e2;color:#991b1b}.badge-espera{background:#e0e7ff;color:#3730a3}.banner{background:var(--amarelo);color:var(--preto);border-radius:14px;padding:14px 18px;font-weight:700;margin-bottom:20px;display:flex;gap:10px;align-items:center}.banner-vermelho{background:var(--vermelho);color:#fff}.banner-cinza{background:var(--cinza-100);color:var(--preto)}
+    .hint-falta{display:none;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.4);color:#fdba74;border-radius:12px;padding:12px 16px;font-weight:600;font-size:.85rem;margin-bottom:16px}.item-falta{display:block;width:100%;text-align:left;background:var(--cinza-800);color:#fff;border:1px solid rgba(249,115,22,.35);border-radius:10px;padding:10px 14px;margin-bottom:6px;font-weight:600;font-size:.85rem;transition:.2s}.item-falta:hover{border-color:var(--laranja)}
+    .campo{margin-bottom:16px}.campo label{display:block;font-weight:700;font-size:.88rem;margin-bottom:6px}.campo input,.campo select,.campo textarea{width:100%;padding:13px 14px;border-radius:12px;border:2px solid var(--cinza-200);background:#fff;transition:.2s;color:var(--preto)}.campo input:focus,.campo select:focus,.campo textarea:focus{outline:none;border-color:var(--laranja);box-shadow:0 0 0 3px rgba(249,115,22,.15)}.campo textarea{min-height:90px;resize:vertical}.campo .ajuda{font-size:.78rem;color:#888;margin-top:4px}.campo-escuro label{color:#fff}.campo-escuro input,.campo-escuro select,.campo-escuro textarea{background:var(--cinza-800);border-color:var(--cinza-700);color:#fff}.campo-escuro input::placeholder,.campo-escuro textarea::placeholder{color:#777}
+    .switch-linha{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--cinza-100);border-radius:12px;padding:12px 16px;margin-bottom:10px}.campo-escuro .switch-linha{background:var(--cinza-800)}.switch-linha .txt{font-weight:600;font-size:.9rem}.switch-linha .sub{font-size:.75rem;color:#888;display:block}.switch{position:relative;width:46px;height:26px;flex-shrink:0}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;background:var(--cinza-200);border-radius:999px;transition:.25s}.slider::before{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.25s;box-shadow:0 1px 3px rgba(0,0,0,.3)}.switch input:checked + .slider{background:var(--laranja)}.switch input:checked + .slider::before{transform:translateX(20px)}
+    .switch-linha.laranja-preto{background:var(--preto);border:1px solid rgba(249,115,22,.45);border-left:4px solid var(--laranja)}.switch-linha.laranja-preto .txt{color:#fff;font-weight:700}.switch-linha.laranja-preto .sub{color:#fdba74}.switch-linha.laranja-preto .slider{background:var(--cinza-800);border:2px solid var(--laranja)}.switch-linha.laranja-preto .slider::before{background:var(--laranja)}.switch-linha.laranja-preto .switch input:checked + .slider{background:var(--laranja);border-color:var(--laranja)}.switch-linha.laranja-preto .switch input:checked + .slider::before{background:var(--preto)}
+    .login-wrap{max-width:420px;margin:60px auto;padding:0 16px}.login-card{background:var(--preto);color:#fff;border-radius:24px;padding:36px 28px;box-shadow:var(--sombra-forte);text-align:center}.login-card .icone{font-size:2.6rem;margin-bottom:10px}.login-card h2{font-size:1.5rem;margin-bottom:4px}.login-card p{color:#aaa;font-size:.9rem;margin-bottom:24px}
+    .adm-topo{background:var(--preto);color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}.adm-topo h1{font-size:1.1rem;font-weight:800;display:flex;align-items:center;gap:10px}.adm-wrap{display:grid;grid-template-columns:1fr;gap:20px;padding:20px 16px 60px;max-width:1200px;margin:0 auto}.adm-menu{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}.adm-menu::-webkit-scrollbar{display:none}.adm-menu button{flex-shrink:0;padding:11px 16px;border-radius:12px;font-weight:700;font-size:.88rem;background:var(--cinza-100);color:var(--preto);transition:.2s;white-space:nowrap}.adm-menu button.ativo{background:var(--laranja);color:#fff}.adm-conteudo{min-width:0}.sec-adm{display:none}.sec-adm.ativo{display:block}.sec-titulo{font-size:1.3rem;font-weight:900;margin-bottom:4px}.sec-sub{color:#777;font-size:.9rem;margin-bottom:20px}.grade-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:20px}.kpi{background:var(--cinza-900);color:#fff;border-radius:var(--raio);padding:18px;border:1px solid var(--cinza-700)}.kpi .rotulo{font-size:.72rem;text-transform:uppercase;letter-spacing:.8px;color:#aaa;font-weight:700}.kpi .numero{font-size:1.7rem;font-weight:900;margin-top:4px}.kpi .numero.laranja{color:var(--laranja)}.kpi .numero.verde{color:var(--verde)}.kpi .numero.vermelho{color:var(--vermelho)}.kpi .numero.amarelo{color:var(--amarelo)}.bloco-adm{background:var(--cinza-900);color:#fff;border-radius:var(--raio);padding:22px;margin-bottom:16px;border:1px solid var(--cinza-700)}.bloco-adm h3{font-size:1.05rem;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:8px}.bloco-adm h4{font-size:.95rem;font-weight:700;margin:18px 0 10px;color:var(--laranja)}.grade-campos{display:grid;grid-template-columns:1fr;gap:0 16px}.tabela-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--cinza-700)}table{width:100%;border-collapse:collapse;min-width:760px}thead th{background:var(--cinza-800);color:#bbb;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.8px;padding:12px 14px;white-space:nowrap}tbody td{padding:12px 14px;border-top:1px solid var(--cinza-700);font-size:.9rem;vertical-align:middle}tbody tr:hover{background:var(--cinza-800)}.reserva-id{font-weight:800;color:var(--laranja);font-size:.82rem}.reserva-nome{font-weight:700}.reserva-sub{font-size:.75rem;color:#888}.acoes-reserva{display:flex;gap:6px;flex-wrap:wrap}select.status-select{background:var(--cinza-800);color:#fff;border:1px solid var(--cinza-700);border-radius:8px;padding:6px 8px;font-size:.8rem;font-weight:700}.busca-adm{width:100%;padding:13px 16px;border-radius:12px;border:2px solid var(--cinza-700);background:var(--cinza-800);color:#fff;margin-bottom:14px}.busca-adm:focus{outline:none;border-color:var(--laranja)}
+    .modal-fundo{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;display:none;align-items:flex-end;justify-content:center}.modal-fundo.aberto{display:flex}.modal{background:#fff;width:100%;max-width:520px;border-radius:24px 24px 0 0;max-height:92vh;overflow-y:auto;padding:26px 20px 30px;animation:subir .3s ease}@keyframes subir{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}.modal-titulo{font-size:1.25rem;font-weight:900;margin-bottom:14px;display:flex;align-items:center;gap:10px}.modal-fechar{position:sticky;top:0;float:right;width:36px;height:36px;border-radius:50%;background:var(--cinza-100);font-size:1.1rem;font-weight:800;color:var(--preto)}.resumo-aula{background:var(--cinza-100);border-radius:14px;padding:16px;margin-bottom:18px}.resumo-aula .linha{display:flex;justify-content:space-between;gap:10px;padding:5px 0;font-size:.92rem}.resumo-aula .linha b{text-align:right}.tela-sucesso{text-align:center}.tela-sucesso .check{width:72px;height:72px;border-radius:50%;background:var(--verde);color:#fff;font-size:2.2rem;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}.dados-reserva{background:var(--cinza-100);border-radius:14px;padding:16px;text-align:left;margin:18px 0}.dados-reserva .linha{display:flex;justify-content:space-between;gap:10px;padding:6px 0;font-size:.92rem;border-bottom:1px dashed var(--cinza-200)}.dados-reserva .linha:last-child{border-bottom:none}.dados-reserva .linha b{text-align:right}.bloco-pix{background:var(--preto);color:#fff;border-radius:16px;padding:20px;margin-top:16px;text-align:left}.bloco-pix h3{color:var(--laranja);font-size:1rem;margin-bottom:10px}.bloco-pix .linha{display:flex;justify-content:space-between;gap:10px;padding:4px 0;font-size:.88rem}.bloco-pix .linha b{text-align:right;word-break:break-all}.chave-pix{background:var(--cinza-800);border:1px dashed var(--laranja);border-radius:10px;padding:10px 12px;font-size:.85rem;word-break:break-all;margin:12px 0;color:#ddd}.pix-qr-box{background:#fff;border-radius:12px;padding:14px;text-align:center;margin:12px 0}.local-box{background:var(--cinza-100);border-radius:14px;padding:16px;margin-top:16px;text-align:left}.local-box h3{font-size:1rem;margin-bottom:8px}.local-box p{font-size:.9rem;color:#555;margin-bottom:4px}.toasts{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;width:calc(100% - 32px);max-width:420px}.toast{background:var(--preto);color:#fff;border-radius:12px;padding:13px 18px;font-weight:600;font-size:.9rem;box-shadow:var(--sombra-forte);display:flex;align-items:center;gap:10px;animation:subir .25s ease}.toast.erro{background:var(--vermelho)}.toast.sucesso{background:var(--verde)}
+    @media(min-width:768px){.aula-info{grid-template-columns:repeat(2,1fr)}.grade-campos{grid-template-columns:repeat(2,1fr)}.grade-campos .campo-largo{grid-column:1/-1}.grade-cards{grid-template-columns:repeat(4,1fr)}.adm-wrap{grid-template-columns:240px 1fr}.adm-menu{flex-direction:column;overflow:visible;position:sticky;top:80px;align-self:start}.adm-menu button{text-align:left}.modal-fundo{align-items:center}.modal{border-radius:24px}.nav{padding:14px 32px}.container{padding:40px 24px 80px}}
   </style>
 </head>
 <body>
   <header class="nav">
-    <div class="nav-brand">
-      <span class="logo">🏋️</span>
-      <span>Agendamento de Aulas</span>
-    </div>
+    <div class="nav-brand"><span class="logo">🏋️</span><span>Agendamento de Aulas</span></div>
     <nav class="nav-acoes">
       <button class="btn-nav ativo" id="navAgendar" onclick="irPara('agendamento')">📅 Agendamento</button>
       <button class="btn-nav" id="navAdm" onclick="irPara('adm')">🔐 Área ADM</button>
@@ -352,7 +55,7 @@
         <p>Digite a senha para acessar o painel.</p>
         <div class="campo campo-escuro" style="text-align:left">
           <label>Senha</label>
-          <input type="password" id="loginSenha" placeholder="••••" onkeydown="if(event.key==='Enter')fazerLogin()">
+          <input type="password" id="loginSenha" placeholder="••••" onkeydown="if(event.key==='Enter')fazerLogin()" />
         </div>
         <button class="btn btn-primario btn-bloqueado" onclick="fazerLogin()">ENTRAR</button>
         <p id="loginErro" class="hidden" style="color:var(--vermelho);margin-top:12px;font-weight:700">Senha incorreta.</p>
@@ -382,26 +85,23 @@
           <p class="sec-sub">Visão geral do seu agendamento.</p>
           <div id="checklistCard"></div>
           <div class="grade-cards" id="kpiCards"></div>
-          <div class="bloco-adm">
-            <h3>🏋️ Próxima aula</h3>
-            <div id="proximaAula"></div>
-          </div>
+          <div class="bloco-adm"><h3>🏋️ Próxima aula</h3><div id="proximaAula"></div></div>
         </section>
 
         <section class="sec-adm" id="sec-aula">
           <h2 class="sec-titulo">🏋️ Configuração da Aula</h2>
-          <p class="sec-sub">Tudo que você cadastrar aqui aparece automaticamente na página de Agendamento.</p>
+          <p class="sec-sub">Tudo que você cadastrar aqui aparece automaticamente na página pública.</p>
           <div id="hintAula" class="hint-falta"></div>
           <div class="bloco-adm">
             <h3>📝 Informações da aula</h3>
             <div class="grade-campos">
-              <div class="campo campo-escuro"><label>Nome da aula</label><input data-cfg="aula.nome" placeholder="Ex.: Treinamento Funcional"></div>
-              <div class="campo campo-escuro"><label>Data</label><input type="date" data-cfg="aula.data"></div>
-              <div class="campo campo-escuro"><label>Dia da semana (automático)</label><input id="diaSemanaInfo" disabled placeholder="Definido pela data"></div>
-              <div class="campo campo-escuro"><label>Horário</label><input type="time" data-cfg="aula.horario"></div>
-              <div class="campo campo-escuro"><label>Duração (minutos)</label><input data-cfg="aula.duracao" placeholder="Ex.: 60"></div>
-              <div class="campo campo-escuro"><label>Quantidade total de vagas</label><input type="number" min="1" data-cfg="aula.vagas" placeholder="Ex.: 8"></div>
-              <div class="campo campo-escuro"><label>Preço (R$)</label><input data-cfg="aula.preco" placeholder="Ex.: 30,00"></div>
+              <div class="campo campo-escuro"><label>Nome da aula</label><input data-cfg="aula.nome" placeholder="Ex.: Treinamento Funcional" /></div>
+              <div class="campo campo-escuro"><label>Data</label><input type="date" data-cfg="aula.data" /></div>
+              <div class="campo campo-escuro"><label>Dia da semana (automático)</label><input id="diaSemanaInfo" disabled placeholder="Definido pela data" /></div>
+              <div class="campo campo-escuro"><label>Horário</label><input type="time" data-cfg="aula.horario" /></div>
+              <div class="campo campo-escuro"><label>Duração (minutos)</label><input data-cfg="aula.duracao" placeholder="Ex.: 60" /></div>
+              <div class="campo campo-escuro"><label>Quantidade total de vagas</label><input type="number" min="1" data-cfg="aula.vagas" placeholder="Ex.: 8" /></div>
+              <div class="campo campo-escuro"><label>Preço (R$)</label><input data-cfg="aula.preco" placeholder="Ex.: 30,00" /></div>
               <div class="campo campo-escuro campo-largo"><label>Descrição</label><textarea data-cfg="aula.descricao" placeholder="Descreva a aula..."></textarea></div>
             </div>
           </div>
@@ -412,8 +112,8 @@
             <div class="switch-linha laranja-preto"><div><span class="txt">Permitir cancelamento</span><span class="sub">O aluno poderá cancelar a própria reserva pelo link enviado</span></div><label class="switch"><input type="checkbox" data-cfg-switch="aula.permitirCancelamento"><span class="slider"></span></label></div>
             <div class="switch-linha laranja-preto"><div><span class="txt">Ativar lista de espera</span><span class="sub">Quando lotar, aparece botão de lista de espera</span></div><label class="switch"><input type="checkbox" data-cfg-switch="aula.listaEspera"><span class="slider"></span></label></div>
             <div class="grade-campos" style="margin-top:14px">
-              <div class="campo campo-escuro"><label>Reservas abrem às (opcional)</label><input type="time" data-cfg="aula.aberturaReservas"></div>
-              <div class="campo campo-escuro"><label>Reservas encerram às (opcional)</label><input type="time" data-cfg="aula.encerramentoReservas"></div>
+              <div class="campo campo-escuro"><label>Reservas abrem às (opcional)</label><input type="time" data-cfg="aula.aberturaReservas" /></div>
+              <div class="campo campo-escuro"><label>Reservas encerram às (opcional)</label><input type="time" data-cfg="aula.encerramentoReservas" /></div>
             </div>
             <p class="ajuda" style="color:#888;font-size:.8rem">Deixe os horários de reserva vazios para permitir reservas a qualquer momento. Eles valem para o dia da aula.</p>
           </div>
@@ -425,21 +125,18 @@
             <div class="switch-linha laranja-preto"><div><span class="txt">Observação obrigatória</span></div><label class="switch"><input type="checkbox" data-cfg-switch="aula.observacaoObrigatoria"><span class="slider"></span></label></div>
             <p class="ajuda" style="color:#888;font-size:.8rem">Nome e WhatsApp são sempre obrigatórios.</p>
           </div>
-          <div class="bloco-adm">
-            <h3>👥 Vagas</h3>
-            <div id="vagasInfoAdm"></div>
-          </div>
+          <div class="bloco-adm"><h3>👥 Vagas</h3><div id="vagasInfoAdm"></div></div>
         </section>
 
         <section class="sec-adm" id="sec-localizacao">
           <h2 class="sec-titulo">📍 Localização</h2>
-          <p class="sec-sub">Cadastre o local da aula. Sem campos de latitude/longitude.</p>
+          <p class="sec-sub">Cadastre o local da aula.</p>
           <div id="hintLocalizacao" class="hint-falta"></div>
           <div class="bloco-adm">
             <div class="grade-campos">
-              <div class="campo campo-escuro"><label>Nome do local</label><input data-cfg="localizacao.nome" placeholder="Ex.: Studio MC Training"></div>
-              <div class="campo campo-escuro"><label>Endereço</label><input data-cfg="localizacao.endereco" placeholder="Rua, número, bairro, cidade"></div>
-              <div class="campo campo-escuro campo-largo"><label>Link da localização exata (Google Maps / GPS)</label><input data-cfg="localizacao.link" placeholder="https://maps.app.goo.gl/..."></div>
+              <div class="campo campo-escuro"><label>Nome do local</label><input data-cfg="localizacao.nome" placeholder="Ex.: Studio MC Training" /></div>
+              <div class="campo campo-escuro"><label>Endereço</label><input data-cfg="localizacao.endereco" placeholder="Rua, número, bairro, cidade" /></div>
+              <div class="campo campo-escuro campo-largo"><label>Link da localização exata (Google Maps / GPS)</label><input data-cfg="localizacao.link" placeholder="https://maps.app.goo.gl/..." /></div>
               <div class="campo campo-escuro campo-largo"><label>Instruções para chegar</label><textarea data-cfg="localizacao.instrucoes" placeholder="Ex.: Estacionamento na rua, entrada pelo portão laranja..."></textarea></div>
             </div>
             <div class="switch-linha laranja-preto"><div><span class="txt">Mostrar localização após o agendamento</span><span class="sub">Se desativado, o aluno não vê o local</span></div><label class="switch"><input type="checkbox" data-cfg-switch="localizacao.mostrarAposAgendamento"><span class="slider"></span></label></div>
@@ -452,10 +149,10 @@
           <div id="hintPagamento" class="hint-falta"></div>
           <div class="bloco-adm">
             <div class="grade-campos">
-              <div class="campo campo-escuro"><label>Valor da aula (R$)</label><input data-cfg="pagamento.valor" placeholder="Ex.: 30,00"></div>
-              <div class="campo campo-escuro"><label>Nome do recebedor</label><input data-cfg="pagamento.recebedor" placeholder="Seu nome"></div>
-              <div class="campo campo-escuro"><label>Chave PIX</label><input data-cfg="pagamento.chavePix" placeholder="CPF, e-mail, telefone ou aleatória"></div>
-              <div class="campo campo-escuro"><label>Cidade</label><input data-cfg="pagamento.cidade" placeholder="Sua cidade"></div>
+              <div class="campo campo-escuro"><label>Valor da aula (R$)</label><input data-cfg="pagamento.valor" placeholder="Ex.: 30,00" /></div>
+              <div class="campo campo-escuro"><label>Nome do recebedor</label><input data-cfg="pagamento.recebedor" placeholder="Seu nome" /></div>
+              <div class="campo campo-escuro"><label>Chave PIX</label><input data-cfg="pagamento.chavePix" placeholder="CPF, e-mail, telefone ou aleatória" /></div>
+              <div class="campo campo-escuro"><label>Cidade</label><input data-cfg="pagamento.cidade" placeholder="Sua cidade" /></div>
               <div class="campo campo-escuro campo-largo"><label>Instruções de pagamento</label><textarea data-cfg="pagamento.instrucoes" placeholder="Ex.: Envie o comprovante após o pagamento..."></textarea></div>
             </div>
             <div class="switch-linha laranja-preto"><div><span class="txt">Ativar PIX</span><span class="sub">Mostra o bloco de pagamento após a reserva</span></div><label class="switch"><input type="checkbox" data-cfg-switch="pagamento.ativo"><span class="slider"></span></label></div>
@@ -466,7 +163,7 @@
                 <option value="manual">Manual (você confirma na área ADM)</option>
                 <option value="automatica">Automática (requer integração com gateway)</option>
               </select>
-              <p class="ajuda" style="color:#888">A confirmação automática só funciona após integrar um gateway (Mercado Pago, Asaas, Efí). Nesta versão, o padrão é manual.</p>
+              <p class="ajuda" style="color:#888">A confirmação automática exige gateway externo. Nesta versão, o padrão é manual.</p>
             </div>
           </div>
         </section>
@@ -474,18 +171,9 @@
         <section class="sec-adm" id="sec-reservas">
           <h2 class="sec-titulo">👥 Reservas</h2>
           <p class="sec-sub">Gerencie os alunos agendados.</p>
-          <input class="busca-adm" id="buscaReservas" placeholder="🔍 Buscar por nome, WhatsApp ou e-mail..." oninput="renderReservas()">
+          <input class="busca-adm" id="buscaReservas" placeholder="🔍 Buscar por nome, WhatsApp ou e-mail..." oninput="renderReservas()" />
           <div class="bloco-adm">
-            <div class="tabela-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>ID</th><th>Aluno</th><th>WhatsApp</th><th>E-mail</th><th>Aula</th><th>Valor</th><th>Status</th><th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody id="tbodyReservas"></tbody>
-              </table>
-            </div>
+            <div class="tabela-wrap"><table><thead><tr><th>ID</th><th>Aluno</th><th>WhatsApp</th><th>E-mail</th><th>Aula</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tbodyReservas"></tbody></table></div>
             <p id="semReservas" class="hidden" style="text-align:center;color:#888;padding:24px">Nenhuma reserva encontrada.</p>
           </div>
         </section>
@@ -495,8 +183,8 @@
           <p class="sec-sub">Mensagens automáticas e envio via WhatsApp.</p>
           <div id="hintComunicacao" class="hint-falta"></div>
           <div class="bloco-adm">
-            <div class="campo campo-escuro"><label>Seu número de WhatsApp (com DDI, ex.: 5511999999999)</label><input data-cfg="comunicacao.whatsapp" placeholder="5511999999999"></div>
-            <div class="campo campo-escuro"><label>E-mail de contato</label><input data-cfg="comunicacao.email" placeholder="voce@email.com"></div>
+            <div class="campo campo-escuro"><label>Seu número de WhatsApp (com DDI, ex.: 5511999999999)</label><input data-cfg="comunicacao.whatsapp" placeholder="5511999999999" /></div>
+            <div class="campo campo-escuro"><label>E-mail de contato</label><input data-cfg="comunicacao.email" placeholder="voce@email.com" /></div>
             <h4>Mensagem de confirmação</h4>
             <div class="campo campo-escuro"><textarea data-cfg="comunicacao.msgConfirmacao">Olá, [NOME]! Seu agendamento para a aula de treinamento funcional foi realizado com sucesso.
 📅 [DATA] às [HORARIO]
@@ -510,15 +198,12 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
             <div class="campo campo-escuro"><textarea data-cfg="comunicacao.msgCancelamento">Olá, [NOME]! Sua reserva [ID] foi cancelada. Qualquer dúvida, estamos à disposição.</textarea></div>
             <p class="ajuda" style="color:#888;font-size:.8rem">Placeholders: [NOME], [ID], [DATA], [HORARIO], [LOCAL], [VALOR], [LINK_CANCELAR]</p>
           </div>
+
           <div class="bloco-adm">
             <h3>📤 Enviar WhatsApp</h3>
             <div class="grade-campos">
               <div class="campo campo-escuro"><label>Reserva</label><select id="selectReservaMsg"></select></div>
-              <div class="campo campo-escuro"><label>Tipo de mensagem</label><select id="selectTipoMsg">
-                <option value="confirmacao">Confirmação</option>
-                <option value="pospago">Após pagamento</option>
-                <option value="cancelamento">Cancelamento</option>
-              </select></div>
+              <div class="campo campo-escuro"><label>Tipo de mensagem</label><select id="selectTipoMsg"><option value="confirmacao">Confirmação</option><option value="pospago">Após pagamento</option><option value="cancelamento">Cancelamento</option></select></div>
             </div>
             <button class="btn btn-sucesso btn-bloqueado" onclick="enviarWhatsApp()">ENVIAR WHATSAPP</button>
             <p class="ajuda" style="color:#888;font-size:.8rem;margin-top:8px">Abre o WhatsApp com a mensagem pronta para enviar ao aluno.</p>
@@ -531,15 +216,15 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
           <div class="bloco-adm">
             <h3>🔑 Alterar senha do ADM</h3>
             <div class="grade-campos">
-              <div class="campo campo-escuro"><label>Nova senha</label><input type="password" id="novaSenha" placeholder="Nova senha"></div>
-              <div class="campo campo-escuro"><label>Confirmar nova senha</label><input type="password" id="confirmaSenha" placeholder="Repita a senha"></div>
+              <div class="campo campo-escuro"><label>Nova senha</label><input type="password" id="novaSenha" placeholder="Nova senha" /></div>
+              <div class="campo campo-escuro"><label>Confirmar nova senha</label><input type="password" id="confirmaSenha" placeholder="Repita a senha" /></div>
             </div>
             <button class="btn btn-primario" onclick="alterarSenha()">ALTERAR SENHA</button>
           </div>
           <div class="bloco-adm">
             <h3>💾 Backup e restauração</h3>
             <button class="btn btn-secundario" onclick="fazerBackup()">BAIXAR BACKUP</button>
-            <div class="campo campo-escuro" style="margin-top:14px"><label>Restaurar configurações (cole o JSON do backup)</label><textarea id="restoreJson" placeholder='Cole aqui o conteúdo do backup...'></textarea></div>
+            <div class="campo campo-escuro" style="margin-top:14px"><label>Restaurar configurações (cole o JSON do backup)</label><textarea id="restoreJson" placeholder="Cole aqui o conteúdo do backup..."></textarea></div>
             <button class="btn btn-contorno" style="border-color:var(--laranja);color:var(--laranja)" onclick="restaurarBackup()">RESTAURAR</button>
           </div>
           <div class="bloco-adm">
@@ -566,59 +251,22 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
   </div>
 
   <div class="toasts" id="toasts"></div>
-
   <noscript><p style="padding:20px;text-align:center">Ative o JavaScript para usar o sistema.</p></noscript>
 
   <script>
     const SUPABASE_URL = 'https://rajivrfdvlhvywdxcrub.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhaml2cmZkdmxodnl3ZHhjcnViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk3NTI4MTcsImV4cCI6MjEwNTMyODgxN30.iUGXW8_0n1sE8AzLknCvN7vWQuNVZ8xRDgV5e95GCUY';
-    const CONFIGURADO = false;
+    const CONFIGURADO = true;
+    const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }) : null;
 
     function configPadrao(){
       return {
-        aula:{
-          nome:'', descricao:'', data:'', horario:'', duracao:'', vagas:'', preco:'',
-          aberta:true, permitirReservas:true, aberturaReservas:'', encerramentoReservas:'',
-          permitirCancelamento:true, listaEspera:false,
-          mostrarEmail:false, emailObrigatorio:false, mostrarObservacao:false, observacaoObrigatoria:false
-        },
+        aula:{ nome:'', descricao:'', data:'', horario:'', duracao:'', vagas:'', preco:'', aberta:true, permitirReservas:true, aberturaReservas:'', encerramentoReservas:'', permitirCancelamento:true, listaEspera:false, mostrarEmail:false, emailObrigatorio:false, mostrarObservacao:false, observacaoObrigatoria:false },
         localizacao:{ nome:'', endereco:'', link:'', instrucoes:'', mostrarAposAgendamento:true },
-        pagamento:{
-          valor:'', recebedor:'', chavePix:'', cidade:'', instrucoes:'',
-          ativo:true, exibirComprovante:true, confirmacao:'manual'
-        },
-        comunicacao:{
-          whatsapp:'', email:'',
-          msgConfirmacao:'Olá, [NOME]! Seu agendamento para a aula de treinamento funcional foi realizado com sucesso.\n📅 [DATA] às [HORARIO]\n📍 [LOCAL]\n💰 [VALOR]\nReserva: [ID]\nPara cancelar: [LINK_CANCELAR]',
-          msgPosPagamento:'Olá, [NOME]! Recebemos seu pagamento. Sua reserva [ID] está confirmada. Até a aula! 💪',
-          msgCancelamento:'Olá, [NOME]! Sua reserva [ID] foi cancelada. Qualquer dúvida, estamos à disposição.'
-        },
+        pagamento:{ valor:'', recebedor:'', chavePix:'', cidade:'', instrucoes:'', ativo:true, exibirComprovante:true, confirmacao:'manual' },
+        comunicacao:{ whatsapp:'', email:'', msgConfirmacao:'Olá, [NOME]! Seu agendamento para a aula de treinamento funcional foi realizado com sucesso.\n📅 [DATA] às [HORARIO]\n📍 [LOCAL]\n💰 [VALOR]\nReserva: [ID]\nPara cancelar: [LINK_CANCELAR]', msgPosPagamento:'Olá, [NOME]! Recebemos seu pagamento. Sua reserva [ID] está confirmada. Até a aula! 💪', msgCancelamento:'Olá, [NOME]! Sua reserva [ID] foi cancelada. Qualquer dúvida, estamos à disposição.' },
         avancado:{ senha:'1234', pausarReservas:false, manutencao:false, agendamentoAtivo:true }
       };
-    }
-
-    function sessaoAtiva(){
-      try{ return sessionStorage.getItem('mcft_adm_sessao') === '1'; }catch(e){ return false; }
-    }
-    function salvarSessao(){
-      try{ sessionStorage.setItem('mcft_adm_sessao', '1'); }catch(e){}
-    }
-    function limparSessao(){
-      try{ sessionStorage.removeItem('mcft_adm_sessao'); }catch(e){}
-    }
-
-    function lerLocal(){
-      try{
-        const c = localStorage.getItem('mcft_config');
-        const r = localStorage.getItem('mcft_reservas');
-        return { config: c ? JSON.parse(c) : null, reservas: r ? JSON.parse(r) : [] };
-      }catch(e){ return { config:null, reservas:[] }; }
-    }
-    function salvarLocal(config, reservas){
-      try{
-        localStorage.setItem('mcft_config', JSON.stringify(config));
-        localStorage.setItem('mcft_reservas', JSON.stringify(reservas));
-      }catch(e){}
     }
 
     let estado = { config: configPadrao(), reservas: [] };
@@ -626,144 +274,104 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
     let ultimoFoco = null;
     let configTimeout = null;
 
-    function mesclar(base, extra){
-      const saida = JSON.parse(JSON.stringify(base));
-      for(const chave in extra){
-        if(saida[chave] && typeof saida[chave] === 'object' && !Array.isArray(saida[chave]) &&
-           extra[chave] && typeof extra[chave] === 'object' && !Array.isArray(extra[chave])){
-          saida[chave] = mesclar(saida[chave], extra[chave]);
-        }else{
-          saida[chave] = extra[chave];
-        }
-      }
-      return saida;
-    }
-
-    function agendarSalvarConfig(){
-      clearTimeout(configTimeout);
-      configTimeout = setTimeout(function(){
-        salvarLocal(estado.config, estado.reservas);
-      }, 400);
-    }
-
-    function renderTudo(){
-      renderPublico();
-      if(!document.getElementById('viewAdm').classList.contains('hidden')){
-        renderDashboard();
-        renderVagasAdm();
-        renderReservas();
-        renderSelectReservasMsg();
-        atualizarDiaSemana();
-        renderHints();
-      }
-    }
-
-    function esc(t){
-      if(t === null || t === undefined) return '';
-      return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-    function fmtData(dataISO){
-      if(!dataISO) return '';
-      try{
-        const d = new Date(dataISO + 'T12:00:00');
-        return d.toLocaleDateString('pt-BR',{weekday:'long', day:'numeric', month:'long'});
-      }catch(e){ return dataISO; }
-    }
-    function fmtDataCurta(dataISO){
-      if(!dataISO) return '';
-      try{
-        const d = new Date(dataISO + 'T12:00:00');
-        return d.toLocaleDateString('pt-BR',{day:'2-digit', month:'2-digit', year:'numeric'});
-      }catch(e){ return dataISO; }
+    function esc(v){ if(v === null || v === undefined) return ''; return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function toast(msg, tipo){
+      const box = document.getElementById('toasts');
+      const t = document.createElement('div');
+      t.className = 'toast' + (tipo === 'erro' ? ' erro' : tipo === 'sucesso' ? ' sucesso' : '');
+      t.textContent = msg;
+      box.appendChild(t);
+      setTimeout(function(){ t.style.opacity = '0'; t.style.transition = '.4s'; }, 2600);
+      setTimeout(function(){ t.remove(); }, 3100);
     }
     function parseValor(v){
       if(v === '' || v === null || v === undefined) return NaN;
       let s = String(v).trim().replace(/[R$\s]/g,'');
-      const temVirgula = s.includes(',');
-      const temPonto = s.includes('.');
-      if(temVirgula && temPonto){
-        s = s.replace(/\./g,'').replace(',','.');
-      }else if(temVirgula){
-        s = s.replace(',','.');
-      }
+      if(s.includes(',') && s.includes('.')) s = s.replace(/\./g,'').replace(',','.');
+      else if(s.includes(',')) s = s.replace(',','.');
       return parseFloat(s);
     }
-    function fmtValor(v){
-      const n = parseValor(v);
-      if(isNaN(n)) return String(v);
-      return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-    }
-    function valorNumero(v){
-      const n = parseValor(v);
-      return isNaN(n) ? 0 : n;
-    }
-    function soDigitos(s){ return String(s||'').replace(/\D/g,''); }
+    function valorNumero(v){ const n = parseValor(v); return isNaN(n) ? 0 : n; }
+    function fmtValor(v){ const n = parseValor(v); if(isNaN(n)) return String(v || 'R$ 0,00'); return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+    function fmtData(v){ if(!v) return ''; try { return new Date(v + 'T12:00:00').toLocaleDateString('pt-BR',{weekday:'long', day:'numeric', month:'long'}); } catch(e){ return v; } }
+    function fmtCurta(v){ if(!v) return ''; try { return new Date(v + 'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit', month:'2-digit', year:'numeric'}); } catch(e){ return v; } }
+    function soDigitos(s){ return String(s || '').replace(/\D/g,''); }
     function gerarIdReserva(){
       const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
       let id = '';
       for(let i=0;i<5;i++) id += chars[Math.floor(Math.random()*chars.length)];
       return 'FT-' + id;
     }
-    function linkBase(){
-      const explicito = location.href.split('#')[0];
-      return explicito && explicito !== 'null' ? explicito : '';
+    function linkBase(){ const explicito = location.href.split('#')[0]; return explicito && explicito !== 'null' ? explicito : ''; }
+    function clone(v){ return JSON.parse(JSON.stringify(v)); }
+    function mesclar(base, extra){
+      const saida = clone(base);
+      for(const key in extra || {}){
+        if(saida[key] && typeof saida[key] === 'object' && !Array.isArray(saida[key]) && extra[key] && typeof extra[key] === 'object' && !Array.isArray(extra[key])){
+          saida[key] = mesclar(saida[key], extra[key]);
+        }else{
+          saida[key] = extra[key];
+        }
+      }
+      return saida;
+    }
+    function lerLocal(){
+      try{
+        const cfg = localStorage.getItem('mcft_config');
+        const res = localStorage.getItem('mcft_reservas');
+        return { config: cfg ? JSON.parse(cfg) : null, reservas: res ? JSON.parse(res) : [] };
+      }catch(e){ return { config:null, reservas:[] }; }
+    }
+    function salvarLocal(config, reservas){
+      try { localStorage.setItem('mcft_config', JSON.stringify(config)); localStorage.setItem('mcft_reservas', JSON.stringify(reservas)); } catch(e){}
+    }
+    function sessaoAtiva(){
+      try { return sessionStorage.getItem('mcft_adm_sessao') === '1'; } catch(e){ return false; }
+    }
+    function salvarSessao(){ try { sessionStorage.setItem('mcft_adm_sessao','1'); } catch(e){} }
+    function limparSessao(){ try { sessionStorage.removeItem('mcft_adm_sessao'); } catch(e){} }
+
+    function setPath(obj, path, value){
+      const parts = path.split('.');
+      let target = obj;
+      for(let i=0;i<parts.length-1;i++){ target = target[parts[i]]; }
+      target[parts[parts.length-1]] = value;
+    }
+    function getPath(obj, path){
+      return path.split('.').reduce(function(a,k){ return a && a[k]; }, obj);
     }
 
-    function vagasOcupadas(){
-      return estado.reservas.filter(r => r.status === 'pendente' || r.status === 'pago').length;
-    }
+    function vagasOcupadas(){ return estado.reservas.filter(r => r.status === 'pendente' || r.status === 'pago').length; }
     function vagasDisponiveis(){
       const total = parseInt(estado.config.aula.vagas, 10);
       if(isNaN(total) || total <= 0) return null;
       return Math.max(0, total - vagasOcupadas());
     }
-    function aulaLotada(){
-      const disp = vagasDisponiveis();
-      return disp !== null && disp <= 0;
-    }
+    function aulaLotada(){ const disp = vagasDisponiveis(); return disp !== null && disp <= 0; }
     function podeAgendar(){
       const c = estado.config;
-      if(c.avancado.manutencao) return {ok:false, motivo:'Sistema em manutenção. Tente novamente mais tarde.'};
+      if(c.avancado.manutencao) return {ok:false, motivo:'Sistema em manutenção.'};
       if(!c.avancado.agendamentoAtivo) return {ok:false, motivo:'Agendamento desativado.'};
       if(c.avancado.pausarReservas) return {ok:false, motivo:'Reservas pausadas pelo administrador.'};
       if(!c.aula.aberta) return {ok:false, motivo:'Aula fechada.'};
       if(!c.aula.permitirReservas) return {ok:false, motivo:'Novas reservas pausadas.'};
       if(!c.aula.nome || !c.aula.data || !c.aula.horario) return {ok:false, motivo:'Aula ainda não configurada.'};
       if(aulaLotada()) return {ok:false, motivo:'AULA LOTADA'};
-      const janela = verificarJanelaReservas();
-      if(janela) return janela;
       return {ok:true};
-    }
-    function verificarJanelaReservas(){
-      const a = estado.config.aula;
-      if(!a.data) return null;
-      const agora = new Date();
-      if(a.aberturaReservas){
-        const [h,m] = a.aberturaReservas.split(':').map(Number);
-        const abertura = new Date(a.data + 'T' + a.aberturaReservas + ':00');
-        if(agora < abertura) return {ok:false, motivo:'Reservas abrem às ' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0')};
-      }
-      if(a.encerramentoReservas){
-        const [h,m] = a.encerramentoReservas.split(':').map(Number);
-        const encerramento = new Date(a.data + 'T' + a.encerramentoReservas + ':00');
-        if(agora > encerramento) return {ok:false, motivo:'Reservas encerradas às ' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0')};
-      }
-      return null;
     }
 
     function itensFaltantes(){
-      const c = estado.config;
-      const falt = [];
-      if(!c.aula.nome) falt.push({sec:'aula', texto:'Defina o nome da aula'});
-      if(!c.aula.data) falt.push({sec:'aula', texto:'Defina a data da aula'});
-      if(!c.aula.horario) falt.push({sec:'aula', texto:'Defina o horário'});
-      if(!c.aula.vagas) falt.push({sec:'aula', texto:'Defina a quantidade de vagas'});
-      if(!c.pagamento.valor && !c.aula.preco) falt.push({sec:'pagamento', texto:'Defina o preço da aula'});
-      if(!c.localizacao.nome) falt.push({sec:'localizacao', texto:'Defina o nome do local'});
-      if(!c.localizacao.link) falt.push({sec:'localizacao', texto:'Adicione o link do GPS'});
-      if(!c.pagamento.chavePix) falt.push({sec:'pagamento', texto:'Adicione a chave PIX'});
-      if(!c.pagamento.recebedor) falt.push({sec:'pagamento', texto:'Nome do recebedor do PIX'});
-      if(!c.comunicacao.whatsapp) falt.push({sec:'comunicacao', texto:'Seu número de WhatsApp'});
+      const c = estado.config; const falt = [];
+      if(!c.aula.nome) falt.push({ sec:'aula', texto:'Defina o nome da aula' });
+      if(!c.aula.data) falt.push({ sec:'aula', texto:'Defina a data da aula' });
+      if(!c.aula.horario) falt.push({ sec:'aula', texto:'Defina o horário' });
+      if(!c.aula.vagas) falt.push({ sec:'aula', texto:'Defina a quantidade de vagas' });
+      if(!c.pagamento.valor && !c.aula.preco) falt.push({ sec:'pagamento', texto:'Defina o preço da aula' });
+      if(!c.localizacao.nome) falt.push({ sec:'localizacao', texto:'Defina o nome do local' });
+      if(!c.localizacao.link) falt.push({ sec:'localizacao', texto:'Adicione o link do GPS' });
+      if(!c.pagamento.chavePix) falt.push({ sec:'pagamento', texto:'Adicione a chave PIX' });
+      if(!c.pagamento.recebedor) falt.push({ sec:'pagamento', texto:'Nome do recebedor do PIX' });
+      if(!c.comunicacao.whatsapp) falt.push({ sec:'comunicacao', texto:'Seu número de WhatsApp' });
       return falt;
     }
     function renderChecklist(){
@@ -773,17 +381,14 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
       if(falt.length === 0){
         el.innerHTML = '<div class="bloco-adm"><h3>✅ Checklist de configuração</h3><p style="color:#4ade80;font-weight:700">Tudo pronto para receber reservas.</p></div>';
       }else{
-        el.innerHTML = '<div class="bloco-adm"><h3>📋 Falta configurar</h3>' +
-          falt.map(function(f){
-            return '<button class="item-falta" onclick="abrirSec(\'' + f.sec + '\', document.querySelector(\'#admMenu button[data-sec="' + f.sec + '"]\'))">➜ ' + esc(f.texto) + '</button>';
-          }).join('') + '</div>';
+        el.innerHTML = '<div class="bloco-adm"><h3>📋 Falta configurar</h3>' + falt.map(function(f){ return '<button class="item-falta" onclick="abrirSec(\'' + f.sec + '\', document.querySelector(\'#admMenu button[data-sec="' + f.sec + '"]\'))">➜ ' + esc(f.texto) + '</button>'; }).join('') + '</div>';
       }
     }
     function renderHints(){
       const falt = itensFaltantes();
-      const porSec = {aula:[], localizacao:[], pagamento:[], comunicacao:[]};
+      const porSec = { aula:[], localizacao:[], pagamento:[], comunicacao:[] };
       falt.forEach(function(f){ if(porSec[f.sec]) porSec[f.sec].push(f.texto); });
-      const ids = {aula:'hintAula', localizacao:'hintLocalizacao', pagamento:'hintPagamento', comunicacao:'hintComunicacao'};
+      const ids = { aula:'hintAula', localizacao:'hintLocalizacao', pagamento:'hintPagamento', comunicacao:'hintComunicacao' };
       for(const s in ids){
         const el = document.getElementById(ids[s]);
         if(!el) continue;
@@ -800,10 +405,9 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
         document.getElementById('navAgendar').classList.add('ativo');
         document.getElementById('navAdm').classList.remove('ativo');
         location.hash = '#/agendamento';
-      }else if(destino === 'adm'){
-        if(sessaoAtiva()){
-          mostrarPainelAdm();
-        }else{
+      } else if(destino === 'adm'){
+        if(sessaoAtiva()) mostrarPainelAdm();
+        else {
           document.getElementById('viewPublico').classList.add('hidden');
           document.getElementById('viewLogin').classList.remove('hidden');
           document.getElementById('viewAdm').classList.add('hidden');
@@ -830,39 +434,41 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
       if(senha === estado.config.avancado.senha){
         salvarSessao();
         mostrarPainelAdm();
-      }else{
+      } else {
         document.getElementById('loginErro').classList.remove('hidden');
       }
     }
-    function sairAdm(){
-      limparSessao();
-      irPara('agendamento');
+    function sairAdm(){ limparSessao(); irPara('agendamento'); }
+
+    function itemInfo(icone, rotulo, valor){
+      return '<div class="aula-info-item"><span class="ic">' + icone + '</span><div><div class="rotulo">' + rotulo + '</div><div class="valor">' + esc(valor) + '</div></div></div>';
+    }
+    function blocoVagas(disp, ocupadas, total){
+      let statusHTML = '';
+      let barCor = '#22c55e';
+      if(disp <= 0){
+        statusHTML = '<span style="color:#f87171;font-weight:900;font-size:1.35rem">🚫 AULA LOTADA</span>'; barCor = '#ef4444';
+      } else if(disp === 1){
+        statusHTML = '<span style="color:#fbbf24;font-weight:900;font-size:1.35rem">⚠️ ÚLTIMA VAGA</span>'; barCor = '#f59e0b';
+      } else if(disp <= 3){
+        statusHTML = '<span style="color:#fb923c;font-weight:900;font-size:1.35rem">' + disp + ' vagas disponíveis</span>'; barCor = '#f97316';
+      } else {
+        statusHTML = '<span style="color:#4ade80;font-weight:900;font-size:1.35rem">' + disp + ' vagas disponíveis</span>';
+      }
+      const pct = total > 0 ? Math.min(100, Math.round((ocupadas / total) * 100)) : 0;
+      return '<div class="aula-info-item" style="grid-column:1/-1;border-color:rgba(249,115,22,.45);background:rgba(249,115,22,.10)"><span class="ic">👥</span><div style="flex:1;min-width:0"><div class="rotulo" style="color:#fdba74">Vagas disponíveis</div><div>' + statusHTML + '</div><div style="background:rgba(255,255,255,.15);border-radius:999px;height:10px;margin-top:10px;overflow:hidden"><div style="width:' + pct + '%;background:' + barCor + ';height:100%;border-radius:999px;transition:.4s"></div></div><div style="font-size:.78rem;color:#aaa;margin-top:6px">' + ocupadas + ' de ' + total + ' vagas ocupadas</div></div></div>';
     }
 
     function renderPublico(){
-      const c = estado.config;
-      const banners = document.getElementById('bannersPublico');
-      const card = document.getElementById('aulaCard');
+      const c = estado.config; const banners = document.getElementById('bannersPublico'); const card = document.getElementById('aulaCard');
       let htmlBanners = '';
-
-      if(c.avancado.manutencao){
-        htmlBanners += '<div class="banner banner-vermelho">🛠️ Sistema em manutenção. Volte em breve!</div>';
-      }
-      if(!c.avancado.agendamentoAtivo){
-        htmlBanners += '<div class="banner banner-cinza">Agendamento desativado no momento.</div>';
-      }
+      if(c.avancado.manutencao) htmlBanners += '<div class="banner banner-vermelho">🛠️ Sistema em manutenção. Volte em breve!</div>';
+      if(!c.avancado.agendamentoAtivo) htmlBanners += '<div class="banner banner-cinza">Agendamento desativado no momento.</div>';
       banners.innerHTML = htmlBanners;
 
-      const a = c.aula;
-      const temAula = a.nome || a.data || a.horario || a.descricao || a.preco || a.vagas;
-
+      const a = c.aula; const temAula = a.nome || a.data || a.horario || a.descricao || a.preco || a.vagas;
       if(!temAula){
-        card.innerHTML =
-          '<div class="card vazio">' +
-            '<div class="icone">🏋️</div>' +
-            '<h3>Nenhuma aula cadastrada</h3>' +
-            '<p>Em breve novas turmas serão abertas aqui. Fique de olho!</p>' +
-          '</div>';
+        card.innerHTML = '<div class="card vazio"><div class="icone">🏋️</div><h3>Nenhuma aula cadastrada</h3><p>Em breve novas turmas serão abertas aqui. Fique de olho!</p></div>';
         return;
       }
 
@@ -871,82 +477,34 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
       const disp = isNaN(totalVagas) || totalVagas <= 0 ? null : Math.max(0, totalVagas - ocupadas);
       const lotada = disp !== null && disp <= 0;
       const pode = podeAgendar();
-
       let badge = '';
       if(lotada) badge = '<span class="badge badge-lotada">AULA LOTADA</span>';
       else if(disp === 1) badge = '<span class="badge badge-ultima">ÚLTIMA VAGA</span>';
       else if(!a.aberta) badge = '<span class="badge badge-fechada">AULA FECHADA</span>';
 
       let info = '';
-      if(a.data) info += itemInfo('📅', 'Data', fmtData(a.data));
-      if(a.horario) info += itemInfo('⏰', 'Horário', a.horario);
-      if(a.duracao) info += itemInfo('⏱️', 'Duração', a.duracao + ' minutos');
-      if(a.preco) info += itemInfo('💰', 'Valor', fmtValor(a.preco));
-      if(c.localizacao.nome && c.localizacao.mostrarAposAgendamento) info += itemInfo('📍', 'Local', c.localizacao.nome);
-      if(disp !== null){
-        info += blocoVagas(disp, ocupadas, totalVagas);
-      }
+      if(a.data) info += itemInfo('📅','Data',fmtData(a.data));
+      if(a.horario) info += itemInfo('⏰','Horário',a.horario);
+      if(a.duracao) info += itemInfo('⏱️','Duração',a.duracao + ' minutos');
+      if(a.preco) info += itemInfo('💰','Valor',fmtValor(a.preco));
+      if(c.localizacao.nome && c.localizacao.mostrarAposAgendamento) info += itemInfo('📍','Local',c.localizacao.nome);
+      if(disp !== null) info += blocoVagas(disp, ocupadas, totalVagas);
 
       let botao = '';
       if(pode.ok){
         botao = '<button class="btn btn-primario btn-bloqueado" onclick="abrirModalAgendar(false)">AGENDAR</button>';
-      }else if(lotada && a.listaEspera){
+      } else if(lotada && a.listaEspera){
         botao = '<button class="btn btn-secundario btn-bloqueado" onclick="abrirModalAgendar(true)">ENTRAR NA LISTA DE ESPERA</button>';
-      }else{
-        botao = '<button class="btn btn-primario btn-bloqueado" disabled>AGENDAR</button>' +
-                '<p style="text-align:center;margin-top:10px;color:#ffb38a;font-weight:700">' + esc(pode.motivo) + '</p>';
+      } else {
+        botao = '<button class="btn btn-primario btn-bloqueado" disabled>AGENDAR</button><p style="text-align:center;margin-top:10px;color:#ffb38a;font-weight:700">' + esc(pode.motivo) + '</p>';
       }
 
-      card.innerHTML =
-        '<div class="aula-destaque">' +
-          '<span class="aula-etiqueta">AULA ÚNICA DO FIM DE SEMANA</span>' +
-          '<h1 class="aula-titulo">' + esc(a.nome) + '</h1>' +
-          (a.descricao ? '<p class="aula-descricao">' + esc(a.descricao) + '</p>' : '') +
-          '<div class="aula-info">' + info + '</div>' +
-          '<div style="display:flex;flex-direction:column;gap:10px">' + badge + botao + '</div>' +
-        '</div>';
-    }
-    function itemInfo(icone, rotulo, valor){
-      return '<div class="aula-info-item"><span class="ic">' + icone + '</span>' +
-             '<div><div class="rotulo">' + rotulo + '</div><div class="valor">' + esc(valor) + '</div></div></div>';
-    }
-    function blocoVagas(disp, ocupadas, total){
-      let statusHTML = '';
-      let barCor = '#22c55e';
-      if(disp <= 0){
-        statusHTML = '<span style="color:#f87171;font-weight:900;font-size:1.35rem">🚫 AULA LOTADA</span>';
-        barCor = '#ef4444';
-      }else if(disp === 1){
-        statusHTML = '<span style="color:#fbbf24;font-weight:900;font-size:1.35rem">⚠️ ÚLTIMA VAGA</span>';
-        barCor = '#f59e0b';
-      }else if(disp <= 3){
-        statusHTML = '<span style="color:#fb923c;font-weight:900;font-size:1.35rem">' + disp + ' vagas disponíveis</span>';
-        barCor = '#f97316';
-      }else{
-        statusHTML = '<span style="color:#4ade80;font-weight:900;font-size:1.35rem">' + disp + ' vagas disponíveis</span>';
-      }
-      const pct = total > 0 ? Math.min(100, Math.round((ocupadas / total) * 100)) : 0;
-      return '<div class="aula-info-item" style="grid-column:1/-1;border-color:rgba(249,115,22,.45);background:rgba(249,115,22,.10)">' +
-        '<span class="ic">👥</span>' +
-        '<div style="flex:1;min-width:0">' +
-          '<div class="rotulo" style="color:#fdba74">Vagas disponíveis</div>' +
-          '<div>' + statusHTML + '</div>' +
-          '<div style="background:rgba(255,255,255,.15);border-radius:999px;height:10px;margin-top:10px;overflow:hidden">' +
-            '<div style="width:' + pct + '%;background:' + barCor + ';height:100%;border-radius:999px;transition:.4s"></div>' +
-          '</div>' +
-          '<div style="font-size:.78rem;color:#aaa;margin-top:6px">' + ocupadas + ' de ' + total + ' vagas ocupadas</div>' +
-        '</div>' +
-      '</div>';
+      card.innerHTML = '<div class="aula-destaque"><span class="aula-etiqueta">AULA ÚNICA DO FIM DE SEMANA</span><h1 class="aula-titulo">' + esc(a.nome) + '</h1>' + (a.descricao ? '<p class="aula-descricao">' + esc(a.descricao) + '</p>' : '') + '<div class="aula-info">' + info + '</div><div style="display:flex;flex-direction:column;gap:10px">' + badge + botao + '</div></div>';
     }
 
     function abrirModalAgendar(espera){
-      ultimoFoco = document.activeElement;
-      modoEspera = espera;
-      const c = estado.config;
-      const a = c.aula;
-      const modal = document.getElementById('modalAgendar');
-      const conteudo = document.getElementById('modalConteudo');
-
+      ultimoFoco = document.activeElement; modoEspera = espera;
+      const c = estado.config; const a = c.aula; const modal = document.getElementById('modalAgendar'); const conteudo = document.getElementById('modalConteudo');
       let resumo = '<div class="resumo-aula">';
       resumo += '<div class="linha"><span>Aula</span><b>' + esc(a.nome) + '</b></div>';
       if(a.data) resumo += '<div class="linha"><span>Data</span><b>' + fmtData(a.data) + '</b></div>';
@@ -957,77 +515,31 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
       resumo += '</div>';
 
       let campos = '';
-      campos += '<div class="campo"><label>Nome completo *</label><input id="fNome" placeholder="Seu nome"></div>';
-      campos += '<div class="campo"><label>WhatsApp *</label><input id="fWhats" placeholder="(11) 99999-9999" inputmode="tel"></div>';
-      if(a.mostrarEmail){
-        campos += '<div class="campo"><label>E-mail' + (a.emailObrigatorio ? ' *' : '') + '</label><input id="fEmail" type="email" placeholder="voce@email.com"></div>';
-      }
-      if(a.mostrarObservacao){
-        campos += '<div class="campo"><label>Observação' + (a.observacaoObrigatoria ? ' *' : '') + '</label><textarea id="fObs" placeholder="Alguma observação?"></textarea></div>';
-      }
-
-      conteudo.innerHTML =
-        '<h2 class="modal-titulo">' + (modoEspera ? '📋 Lista de espera' : '📅 Confirmar agendamento') + '</h2>' +
-        resumo + campos +
-        '<button class="btn btn-primario btn-bloqueado" onclick="confirmarAgendamento()">' +
-        (modoEspera ? 'ENTRAR NA LISTA DE ESPERA' : 'CONFIRMAR AGENDAMENTO') + '</button>';
-
+      campos += '<div class="campo"><label>Nome completo *</label><input id="fNome" placeholder="Seu nome" /></div>';
+      campos += '<div class="campo"><label>WhatsApp *</label><input id="fWhats" placeholder="(11) 99999-9999" inputmode="tel" /></div>';
+      if(a.mostrarEmail){ campos += '<div class="campo"><label>E-mail' + (a.emailObrigatorio ? ' *' : '') + '</label><input id="fEmail" type="email" placeholder="voce@email.com" /></div>'; }
+      if(a.mostrarObservacao){ campos += '<div class="campo"><label>Observação' + (a.observacaoObrigatoria ? ' *' : '') + '</label><textarea id="fObs" placeholder="Alguma observação?"></textarea></div>'; }
+      conteudo.innerHTML = '<h2 class="modal-titulo">' + (modoEspera ? '📋 Lista de espera' : '📅 Confirmar agendamento') + '</h2>' + resumo + campos + '<button class="btn btn-primario btn-bloqueado" onclick="confirmarAgendamento()">' + (modoEspera ? 'ENTRAR NA LISTA DE ESPERA' : 'CONFIRMAR AGENDAMENTO') + '</button>';
       modal.classList.add('aberto');
-      setTimeout(function(){
-        const primeiro = modal.querySelector('input,button');
-        if(primeiro && primeiro.focus) primeiro.focus();
-      }, 60);
+      setTimeout(function(){ const primeiro = modal.querySelector('input,button'); if(primeiro && primeiro.focus) primeiro.focus(); }, 60);
     }
-
     function confirmarAgendamento(){
-      const c = estado.config;
-      const a = c.aula;
-      const nome = document.getElementById('fNome').value.trim();
-      const whats = soDigitos(document.getElementById('fWhats').value);
-      const emailEl = document.getElementById('fEmail');
-      const obsEl = document.getElementById('fObs');
-      const email = emailEl ? emailEl.value.trim() : '';
-      const obs = obsEl ? obsEl.value.trim() : '';
-
+      const c = estado.config; const a = c.aula; const nome = document.getElementById('fNome').value.trim(); const whats = soDigitos(document.getElementById('fWhats').value);
+      const emailEl = document.getElementById('fEmail'); const obsEl = document.getElementById('fObs');
+      const email = emailEl ? emailEl.value.trim() : ''; const obs = obsEl ? obsEl.value.trim() : '';
       if(!nome){ toast('Informe seu nome.', 'erro'); return; }
       if(whats.length < 10 || whats.length > 13){ toast('Informe um WhatsApp válido com DDD.', 'erro'); return; }
       if(a.mostrarEmail && a.emailObrigatorio && !email){ toast('Informe seu e-mail.', 'erro'); return; }
       if(a.mostrarObservacao && a.observacaoObrigatoria && !obs){ toast('Preencha a observação.', 'erro'); return; }
 
-      const duplicata = estado.reservas.some(function(r){
-        return r.whatsapp === whats &&
-               r.dataAula === a.data &&
-               (modoEspera ? r.status === 'espera' : (r.status === 'pendente' || r.status === 'pago'));
-      });
-      if(duplicata){
-        toast(modoEspera ? 'Você já está na lista de espera desta aula.' : 'Você já tem uma reserva para esta aula. Se precisar, cancele pela mensagem que recebeu.', 'erro');
-        return;
-      }
+      const duplicata = estado.reservas.some(function(r){ return r.whatsapp === whats && r.dataAula === a.data && (modoEspera ? r.status === 'espera' : (r.status === 'pendente' || r.status === 'pago')); });
+      if(duplicata){ toast(modoEspera ? 'Você já está na lista de espera desta aula.' : 'Você já tem uma reserva para esta aula.', 'erro'); return; }
 
-      const valor = c.pagamento.valor || a.preco;
-      const reserva = {
-        id: gerarIdReserva(),
-        nome: nome,
-        whatsapp: whats,
-        email: email,
-        observacao: obs,
-        dataAula: a.data,
-        horarioAula: a.horario,
-        valor: valor,
-        status: modoEspera ? 'espera' : 'pendente',
-        criada_em: new Date().toISOString()
-      };
-      estado.reservas.push(reserva);
-      salvarLocal(estado.config, estado.reservas);
-      renderPublico();
-      mostrarSucesso(reserva);
+      const valor = c.pagamento.valor || a.preco; const reserva = { id:gerarIdReserva(), nome:nome, whatsapp:whats, email:email, observacao:obs, dataAula:a.data, horarioAula:a.horario, valor:valor, status:modoEspera ? 'espera' : 'pendente', criada_em:new Date().toISOString() };
+      estado.reservas.push(reserva); salvarLocal(estado.config, estado.reservas); persistirReserva(reserva); renderPublico(); mostrarSucesso(reserva);
     }
-
     function mostrarSucesso(r){
-      const c = estado.config;
-      const conteudo = document.getElementById('modalConteudo');
-      const valor = r.valor;
-
+      const c = estado.config; const conteudo = document.getElementById('modalConteudo');
       let dados = '<div class="dados-reserva">';
       dados += '<div class="linha"><span>Nome</span><b>' + esc(r.nome) + '</b></div>';
       dados += '<div class="linha"><span>Data</span><b>' + fmtData(r.dataAula) + '</b></div>';
@@ -1035,95 +547,39 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
       dados += '<div class="linha"><span>Aula</span><b>' + esc(c.aula.nome) + '</b></div>';
       if(c.localizacao.nome) dados += '<div class="linha"><span>Local</span><b>' + esc(c.localizacao.nome) + '</b></div>';
       dados += '<div class="linha"><span>Número da reserva</span><b>' + esc(r.id) + '</b></div>';
-      if(valor) dados += '<div class="linha"><span>Valor</span><b>' + fmtValor(valor) + '</b></div>';
+      if(r.valor) dados += '<div class="linha"><span>Valor</span><b>' + fmtValor(r.valor) + '</b></div>';
       dados += '<div class="linha"><span>Pagamento</span><b>PIX</b></div>';
       dados += '</div>';
 
       let local = '';
-      if(c.localizacao.mostrarAposAgendamento && (c.localizacao.nome || c.localizacao.endereco)){
-        local = '<div class="local-box">' +
-          '<h3>📍 LOCALIZAÇÃO DA AULA</h3>' +
-          (c.localizacao.nome ? '<p><b>' + esc(c.localizacao.nome) + '</b></p>' : '') +
-          (c.localizacao.endereco ? '<p>' + esc(c.localizacao.endereco) + '</p>' : '') +
-          (c.localizacao.instrucoes ? '<p>' + esc(c.localizacao.instrucoes) + '</p>' : '') +
-          (c.localizacao.link ?
-            '<a class="btn btn-secundario btn-bloqueado" style="margin-top:12px;text-decoration:none" href="' + esc(c.localizacao.link) + '" target="_blank" rel="noopener">ABRIR LOCALIZAÇÃO NO GPS</a>' : '') +
-        '</div>';
+      if(c.localizacao.mostrarAposAgendamento && (c.localizacao.nome || c.localizacao.endereco || c.localizacao.instrucoes)){
+        local = '<div class="local-box"><h3>📍 LOCALIZAÇÃO DA AULA</h3>' + (c.localizacao.nome ? '<p><b>' + esc(c.localizacao.nome) + '</b></p>' : '') + (c.localizacao.endereco ? '<p>' + esc(c.localizacao.endereco) + '</p>' : '') + (c.localizacao.instrucoes ? '<p>' + esc(c.localizacao.instrucoes) + '</p>' : '') + (c.localizacao.link ? '<a class="btn btn-secundario btn-bloqueado" style="margin-top:12px;text-decoration:none" href="' + esc(c.localizacao.link) + '" target="_blank" rel="noopener">ABRIR LOCALIZAÇÃO NO GPS</a>' : '') + '</div>';
       }
 
       let pix = '';
       if(c.pagamento.ativo && c.pagamento.chavePix){
-        pix = '<div class="bloco-pix">' +
-          '<h3>💳 PAGAMENTO VIA PIX</h3>' +
-          (c.pagamento.recebedor ? '<div class="linha"><span>Recebedor</span><b>' + esc(c.pagamento.recebedor) + '</b></div>' : '') +
-          (valor ? '<div class="linha"><span>Valor</span><b>' + fmtValor(valor) + '</b></div>' : '') +
-          (c.pagamento.cidade ? '<div class="linha"><span>Cidade</span><b>' + esc(c.pagamento.cidade) + '</b></div>' : '') +
-          '<div class="linha"><span>Chave PIX</span></div>' +
-          '<div class="chave-pix" id="chavePixTexto">' + esc(c.pagamento.chavePix) + '</div>' +
-          '<div class="pix-qr-box" id="qrcodePix" style="display:none"></div>' +
-          '<p id="qrNota" class="ajuda" style="color:#888;font-size:.75rem;text-align:center;display:none">QR Code indisponível sem conexão: use a chave ou o copia e cola abaixo.</p>' +
-          '<button class="btn btn-primario btn-bloqueado" onclick="copiarChavePix()">COPIAR CHAVE PIX</button>' +
-          '<button class="btn btn-contorno btn-bloqueado" style="border-color:var(--laranja);color:var(--laranja);margin-top:10px" onclick="copiarPayloadPix()">COPIAR PIX COPIA E COLA</button>' +
-          '<div class="chave-pix" id="payloadPix" style="font-size:.72rem;margin-top:10px"></div>' +
-          (c.pagamento.instrucoes ? '<p style="font-size:.82rem;color:#bbb;margin-top:10px">' + esc(c.pagamento.instrucoes) + '</p>' : '') +
-          (c.pagamento.exibirComprovante && c.comunicacao.whatsapp ?
-            '<button class="btn btn-contorno btn-bloqueado" style="border-color:var(--laranja);color:var(--laranja);margin-top:10px" onclick="enviarComprovante(\'' + esc(r.id) + '\')">ENVIAR COMPROVANTE</button>' : '') +
-          '<p class="ajuda" style="color:#888;font-size:.75rem;margin-top:10px">Após o pagamento, sua reserva será confirmada pelo administrador.</p>' +
-        '</div>';
+        pix = '<div class="bloco-pix"><h3>💳 PAGAMENTO VIA PIX</h3>' + (c.pagamento.recebedor ? '<div class="linha"><span>Recebedor</span><b>' + esc(c.pagamento.recebedor) + '</b></div>' : '') + (r.valor ? '<div class="linha"><span>Valor</span><b>' + fmtValor(r.valor) + '</b></div>' : '') + (c.pagamento.cidade ? '<div class="linha"><span>Cidade</span><b>' + esc(c.pagamento.cidade) + '</b></div>' : '') + '<div class="linha"><span>Chave PIX</span></div><div class="chave-pix" id="chavePixTexto">' + esc(c.pagamento.chavePix) + '</div><div class="pix-qr-box" id="qrcodePix" style="display:none"></div><p id="qrNota" class="ajuda" style="color:#888;font-size:.75rem;text-align:center;display:none">QR Code indisponível sem conexão: use a chave ou o copia e cola abaixo.</p><button class="btn btn-primario btn-bloqueado" onclick="copiarChavePix()">COPIAR CHAVE PIX</button><button class="btn btn-contorno btn-bloqueado" style="border-color:var(--laranja);color:var(--laranja);margin-top:10px" onclick="copiarPayloadPix()">COPIAR PIX COPIA E COLA</button><div class="chave-pix" id="payloadPix" style="font-size:.72rem;margin-top:10px"></div>' + (c.pagamento.instrucoes ? '<p style="font-size:.82rem;color:#bbb;margin-top:10px">' + esc(c.pagamento.instrucoes) + '</p>' : '') + (c.pagamento.exibirComprovante && c.comunicacao.whatsapp ? '<button class="btn btn-contorno btn-bloqueado" style="border-color:var(--laranja);color:var(--laranja);margin-top:10px" onclick="enviarComprovante(\'' + esc(r.id) + '\')">ENVIAR COMPROVANTE</button>' : '') + '<p class="ajuda" style="color:#888;font-size:.75rem;margin-top:10px">Após o pagamento, sua reserva será confirmada pelo administrador.</p></div>';
       }
 
-      const titulo = r.status === 'espera'
-        ? '<div class="tela-sucesso"><div class="check">📋</div><h2 style="margin-bottom:6px">VOCÊ ESTÁ NA LISTA DE ESPERA</h2><p style="color:#666">Se uma vaga abrir, entraremos em contato.</p></div>'
-        : '<div class="tela-sucesso"><div class="check">✅</div><h2 style="margin-bottom:6px">AGENDAMENTO CONFIRMADO</h2><p style="color:#666">Sua vaga foi reservada. Guarde o número da reserva.</p></div>';
+      const titulo = r.status === 'espera' ? '<div class="tela-sucesso"><div class="check">📋</div><h2 style="margin-bottom:6px">VOCÊ ESTÁ NA LISTA DE ESPERA</h2><p style="color:#666">Se uma vaga abrir, entraremos em contato.</p></div>' : '<div class="tela-sucesso"><div class="check">✅</div><h2 style="margin-bottom:6px">AGENDAMENTO CONFIRMADO</h2><p style="color:#666">Sua vaga foi reservada. Guarde o número da reserva.</p></div>';
+      conteudo.innerHTML = titulo + dados + local + pix + '<button class="btn btn-secundario btn-bloqueado" style="margin-top:18px" onclick="fecharModal()">FECHAR</button>';
 
-      conteudo.innerHTML =
-        titulo + dados + local + pix +
-        '<button class="btn btn-secundario btn-bloqueado" style="margin-top:18px" onclick="fecharModal()">FECHAR</button>';
-
-      const payload = gerarPixCopiaECola(r);
-      const payloadEl = document.getElementById('payloadPix');
-      if(payloadEl){
-        payloadEl.dataset.payload = payload;
-        payloadEl.textContent = payload ? 'Copia e cola gerado. Toque em copiar.' : '';
-      }
-      const qrBox = document.getElementById('qrcodePix');
-      const qrNota = document.getElementById('qrNota');
-      try{
-        if(qrBox && payload && typeof QRCode !== 'undefined'){
-          qrBox.innerHTML = '';
-          new QRCode(qrBox, { text: payload, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M });
-          qrBox.style.display = 'block';
-          qrNota.style.display = 'none';
-        }else if(qrBox && payload){
-          qrNota.style.display = 'block';
-        }
-      }catch(e){
-        if(qrNota) qrNota.style.display = 'block';
-      }
+      const payload = gerarPixCopiaECola(r); const payloadEl = document.getElementById('payloadPix');
+      if(payloadEl){ payloadEl.dataset.payload = payload; payloadEl.textContent = payload ? 'Copia e cola gerado. Toque em copiar.' : ''; }
+      const qrBox = document.getElementById('qrcodePix'); const qrNota = document.getElementById('qrNota');
+      try {
+        if(qrBox && payload && typeof QRCode !== 'undefined'){ qrBox.innerHTML = ''; new QRCode(qrBox, { text: payload, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M }); qrBox.style.display = 'block'; qrNota.style.display = 'none'; }
+        else if(qrBox && payload && qrNota){ qrNota.style.display = 'block'; }
+      } catch(e){ if(qrNota) qrNota.style.display = 'block'; }
     }
 
-    function crc16(str){
-      let crc = 0xFFFF;
-      for(let i=0;i<str.length;i++){
-        crc ^= str.charCodeAt(i) << 8;
-        for(let j=0;j<8;j++){
-          crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1);
-          crc &= 0xFFFF;
-        }
-      }
-      return crc.toString(16).toUpperCase().padStart(4,'0');
-    }
+    function crc16(str){ let crc = 0xFFFF; for(let i=0;i<str.length;i++){ crc ^= str.charCodeAt(i) << 8; for(let j=0;j<8;j++){ crc = (crc & 0x8000) ? ((crc << 1) ^ 0x1021) : (crc << 1); crc &= 0xFFFF; } } return crc.toString(16).toUpperCase().padStart(4,'0'); }
     function gerarPixCopiaECola(reserva){
-      const c = estado.config;
-      const chave = (c.pagamento.chavePix || '').trim();
-      if(!chave) return '';
-      const valor = reserva.valor ? valorNumero(reserva.valor).toFixed(2) : '';
-      const nome = (c.pagamento.recebedor || '').trim();
-      const cidade = (c.pagamento.cidade || '').trim();
-
+      const c = estado.config; const chave = (c.pagamento.chavePix || '').trim(); if(!chave) return '';
+      const valor = reserva.valor ? valorNumero(reserva.valor).toFixed(2) : ''; const nome = (c.pagamento.recebedor || '').trim(); const cidade = (c.pagamento.cidade || '').trim();
       let payload = '000201';
-      let mcc = '0014BR.GOV.BCB.PIX' + '01' + String(chave.length).padStart(2,'0') + chave;
-      payload += '26' + String(mcc.length).padStart(2,'0') + mcc;
+      const chavePart = '0014BR.GOV.BCB.PIX' + '01' + String(chave.length).padStart(2,'0') + chave;
+      payload += '26' + String(chavePart.length).padStart(2,'0') + chavePart;
       payload += '52040000';
       payload += '5303986';
       if(valor && !isNaN(parseFloat(valor))) payload += '54' + String(valor.length).padStart(2,'0') + valor;
@@ -1131,71 +587,31 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
       if(nome) payload += '59' + String(Math.min(nome.length,25)).padStart(2,'0') + nome.slice(0,25);
       if(cidade) payload += '60' + String(Math.min(cidade.length,15)).padStart(2,'0') + cidade.slice(0,15);
       const txid = String(reserva.id || '***').replace(/[^A-Za-z0-9]/g,'').slice(0,25) || '***';
-      const add = '05' + String(txid.length).padStart(2,'0') + txid;
-      payload += '62' + String(add.length).padStart(2,'0') + add;
+      payload += '62' + String(('05' + String(txid.length).padStart(2,'0') + txid).length).padStart(2,'0') + '05' + String(txid.length).padStart(2,'0') + txid;
       payload += '6304';
       payload += crc16(payload);
       return payload;
     }
     function copiarTexto(texto, msgOk){
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(texto).then(function(){ toast(msgOk); }).catch(function(){ fallbackCopia(texto, msgOk); });
-      }else{
-        fallbackCopia(texto, msgOk);
-      }
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(texto).then(function(){ toast(msgOk); }).catch(function(){ fallbackCopia(texto, msgOk); }); }
+      else fallbackCopia(texto, msgOk);
     }
     function fallbackCopia(texto, msgOk){
-      const ta = document.createElement('textarea');
-      ta.value = texto;
-      document.body.appendChild(ta);
-      ta.select();
-      try{ document.execCommand('copy'); toast(msgOk); }catch(e){ toast('Copie manualmente o texto destacado.', 'erro'); }
+      const ta = document.createElement('textarea'); ta.value = texto; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); toast(msgOk); } catch(e){ toast('Copie manualmente o texto destacado.', 'erro'); }
       document.body.removeChild(ta);
     }
-    function copiarChavePix(){
-      const chave = estado.config.pagamento.chavePix;
-      if(!chave) return;
-      copiarTexto(chave, 'Chave PIX copiada!');
-    }
-    function copiarPayloadPix(){
-      const el = document.getElementById('payloadPix');
-      if(!el || !el.dataset.payload){ toast('PIX copia e cola indisponível.', 'erro'); return; }
-      copiarTexto(el.dataset.payload, 'PIX copia e cola copiado!');
-    }
-    function enviarComprovante(idReserva){
-      const r = estado.reservas.find(x => x.id === idReserva);
-      const c = estado.config;
-      if(!r || !c.comunicacao.whatsapp) return;
-      const msg = 'Olá! Acabei de realizar o pagamento da minha reserva ' + r.id + ' (' + r.nome + ').';
-      window.open('https://wa.me/' + soDigitos(c.comunicacao.whatsapp) + '?text=' + encodeURIComponent(msg), '_blank');
-    }
-    function fecharModal(){
-      document.getElementById('modalAgendar').classList.remove('aberto');
-      if(ultimoFoco && ultimoFoco.focus) ultimoFoco.focus();
-    }
+    function copiarChavePix(){ const chave = estado.config.pagamento.chavePix; if(!chave) return; copiarTexto(chave,'Chave PIX copiada!'); }
+    function copiarPayloadPix(){ const el = document.getElementById('payloadPix'); if(!el || !el.dataset.payload){ toast('PIX copia e cola indisponível.', 'erro'); return; } copiarTexto(el.dataset.payload,'PIX copia e cola copiado!'); }
+    function enviarComprovante(idReserva){ const r = estado.reservas.find(x => x.id === idReserva); const c = estado.config; if(!r || !c.comunicacao.whatsapp) return; const msg = 'Olá! Acabei de realizar o pagamento da minha reserva ' + r.id + ' (' + r.nome + ').'; window.open('https://wa.me/' + soDigitos(c.comunicacao.whatsapp) + '?text=' + encodeURIComponent(msg), '_blank'); }
+    function fecharModal(){ document.getElementById('modalAgendar').classList.remove('aberto'); if(ultimoFoco && ultimoFoco.focus) ultimoFoco.focus(); }
 
     function abrirModalCancelamento(id){
       irPara('agendamento');
-      const r = estado.reservas.find(x => x.id === id);
-      const c = estado.config;
-      const conteudo = document.getElementById('modalConteudo');
-      const modal = document.getElementById('modalAgendar');
-
-      if(!r){
-        conteudo.innerHTML = '<h2 class="modal-titulo">❌ Reserva não encontrada</h2><p>Verifique o link. Se a reserva foi excluída pelo administrador, não é possível cancelar por aqui.</p><button class="btn btn-secundario btn-bloqueado" style="margin-top:16px" onclick="fecharModal()">FECHAR</button>';
-        modal.classList.add('aberto');
-        return;
-      }
-      if(r.status === 'cancelado'){
-        conteudo.innerHTML = '<div class="tela-sucesso"><div class="check">✅</div><h2 style="margin-bottom:6px">RESERVA JÁ CANCELADA</h2><p style="color:#666">Não é necessário fazer mais nada.</p></div><button class="btn btn-secundario btn-bloqueado" style="margin-top:18px" onclick="fecharModal()">FECHAR</button>';
-        modal.classList.add('aberto');
-        return;
-      }
-      if(!c.aula.permitirCancelamento){
-        conteudo.innerHTML = '<div class="tela-sucesso"><div class="check">🔒</div><h2 style="margin-bottom:6px">CANCELAMENTO ENCERRADO</h2><p style="color:#666">O cancelamento pela internet foi desativado. Fale direto com o professor.</p></div><button class="btn btn-secundario btn-bloqueado" style="margin-top:18px" onclick="fecharModal()">FECHAR</button>';
-        modal.classList.add('aberto');
-        return;
-      }
+      const r = estado.reservas.find(x => x.id === id); const c = estado.config; const modal = document.getElementById('modalAgendar'); const conteudo = document.getElementById('modalConteudo');
+      if(!r){ conteudo.innerHTML = '<h2 class="modal-titulo">❌ Reserva não encontrada</h2><p>Verifique o link. Se a reserva foi excluída pelo administrador, não é possível cancelar por aqui.</p><button class="btn btn-secundario btn-bloqueado" style="margin-top:16px" onclick="fecharModal()">FECHAR</button>'; modal.classList.add('aberto'); return; }
+      if(r.status === 'cancelado'){ conteudo.innerHTML = '<div class="tela-sucesso"><div class="check">✅</div><h2 style="margin-bottom:6px">RESERVA JÁ CANCELADA</h2><p style="color:#666">Não é necessário fazer mais nada.</p></div><button class="btn btn-secundario btn-bloqueado" style="margin-top:18px" onclick="fecharModal()">FECHAR</button>'; modal.classList.add('aberto'); return; }
+      if(!c.aula.permitirCancelamento){ conteudo.innerHTML = '<div class="tela-sucesso"><div class="check">🔒</div><h2 style="margin-bottom:6px">CANCELAMENTO ENCERRADO</h2><p style="color:#666">O cancelamento pela internet foi desativado. Fale direto com o professor.</p></div><button class="btn btn-secundario btn-bloqueado" style="margin-top:18px" onclick="fecharModal()">FECHAR</button>'; modal.classList.add('aberto'); return; }
 
       let resumo = '<div class="resumo-aula">';
       resumo += '<div class="linha"><span>Reserva</span><b>' + esc(r.id) + '</b></div>';
@@ -1204,169 +620,58 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
       if(r.valor) resumo += '<div class="linha"><span>Valor</span><b>' + fmtValor(r.valor) + '</b></div>';
       resumo += '<div class="linha"><span>Status</span><b>' + (r.status === 'pago' ? 'Pago' : r.status === 'espera' ? 'Lista de espera' : 'Pendente') + '</b></div>';
       resumo += '</div>';
-
-      conteudo.innerHTML =
-        '<h2 class="modal-titulo">🗑️ Cancelar reserva</h2>' +
-        resumo +
-        (r.status === 'pago' ? '<div class="banner banner-vermelho" style="font-size:.85rem">Você já pagou. O cancelamento libera a vaga, mas o reembolso é tratado diretamente com o professor.</div>' : '') +
-        '<button class="btn btn-perigo btn-bloqueado" onclick="confirmarCancelamentoPublico(\'' + esc(r.id) + '\')">CANCELAR MINHA RESERVA</button>' +
-        '<button class="btn btn-contorno btn-bloqueado" style="margin-top:10px" onclick="fecharModal()">VOLTAR</button>';
-
+      conteudo.innerHTML = '<h2 class="modal-titulo">🗑️ Cancelar reserva</h2>' + resumo + (r.status === 'pago' ? '<div class="banner banner-vermelho" style="font-size:.85rem">Você já pagou. O cancelamento libera a vaga, mas o reembolso é tratado diretamente com o professor.</div>' : '') + '<button class="btn btn-perigo btn-bloqueado" onclick="confirmarCancelamentoPublico(\'' + esc(r.id) + '\')">CANCELAR MINHA RESERVA</button><button class="btn btn-contorno btn-bloqueado" style="margin-top:10px" onclick="fecharModal()">VOLTAR</button>';
       modal.classList.add('aberto');
     }
-    function confirmarCancelamentoPublico(id){
-      const r = estado.reservas.find(x => x.id === id);
-      if(!r) return;
-      r.status = 'cancelado';
-      salvarLocal(estado.config, estado.reservas);
-      renderPublico();
-      document.getElementById('modalConteudo').innerHTML =
-        '<div class="tela-sucesso"><div class="check">✅</div><h2 style="margin-bottom:6px">RESERVA CANCELADA</h2><p style="color:#666">Sua vaga foi liberada. Se você já pagou, o reembolso é combinado diretamente com o professor.</p></div>' +
-        '<button class="btn btn-secundario btn-bloqueado" style="margin-top:18px" onclick="fecharModal()">FECHAR</button>';
-      toast('Reserva cancelada.');
-    }
+    function confirmarCancelamentoPublico(id){ const r = estado.reservas.find(x => x.id === id); if(!r) return; r.status = 'cancelado'; salvarLocal(estado.config, estado.reservas); persistirStatusReserva(id, 'cancelado'); renderPublico(); document.getElementById('modalConteudo').innerHTML = '<div class="tela-sucesso"><div class="check">✅</div><h2 style="margin-bottom:6px">RESERVA CANCELADA</h2><p style="color:#666">Sua vaga foi liberada. Se você já pagou, o reembolso é combinado diretamente com o professor.</p></div><button class="btn btn-secundario btn-bloqueado" style="margin-top:18px" onclick="fecharModal()">FECHAR</button>'; toast('Reserva cancelada.'); }
 
+    function kpiCard(rotulo, numero, cor, icone){ return '<div class="kpi"><div class="rotulo">' + icone + ' ' + rotulo + '</div><div class="numero ' + cor + '">' + esc(numero) + '</div></div>'; }
     function renderDashboard(){
-      const c = estado.config;
-      const r = estado.reservas;
-      const total = r.length;
-      const pagos = r.filter(x => x.status === 'pago').length;
-      const pendentes = r.filter(x => x.status === 'pendente').length;
-      const receita = r.filter(x => x.status === 'pago').reduce(function(s,x){ return s + valorNumero(x.valor); }, 0);
-
+      const total = estado.reservas.length; const pagos = estado.reservas.filter(x => x.status === 'pago').length; const pendentes = estado.reservas.filter(x => x.status === 'pendente').length; const receita = estado.reservas.filter(x => x.status === 'pago').reduce(function(s,x){ return s + valorNumero(x.valor); }, 0);
       renderChecklist();
-
-      document.getElementById('kpiCards').innerHTML =
-        kpiCard('Total de reservas', total, 'laranja', '👥') +
-        kpiCard('Pagamentos confirmados', pagos, 'verde', '✅') +
-        kpiCard('Pagamentos pendentes', pendentes, 'amarelo', '⏳') +
-        kpiCard('Receita', fmtValor(receita), 'verde', '💰');
-
-      const a = c.aula;
-      const temAula = a.nome || a.data || a.horario;
-      const prox = document.getElementById('proximaAula');
-      if(!temAula){
-        prox.innerHTML = '<div class="vazio" style="padding:30px"><div class="icone">🏋️</div><h3 style="color:var(--branco)">Nenhuma aula cadastrada</h3><p>Configure a aula na aba "Aula" para ver os dados aqui.</p></div>';
-      }else{
-        const disp = vagasDisponiveis();
-        prox.innerHTML =
-          '<div class="grade-campos">' +
-            '<div class="campo campo-escuro"><label>Aula</label><div style="font-weight:800">' + esc(a.nome || 'Sem nome') + '</div></div>' +
-            '<div class="campo campo-escuro"><label>Data</label><div style="font-weight:800">' + (a.data ? fmtData(a.data) : 'Não definida') + '</div></div>' +
-            '<div class="campo campo-escuro"><label>Horário</label><div style="font-weight:800">' + esc(a.horario || 'Não definido') + '</div></div>' +
-            '<div class="campo campo-escuro"><label>Vagas</label><div style="font-weight:800">' + (disp !== null ? disp + ' disponíveis de ' + a.vagas : 'Sem limite') + ' · ' + vagasOcupadas() + ' ocupadas</div></div>' +
-            '<div class="campo campo-escuro"><label>Reservas registradas</label><div style="font-weight:800">' + r.length + '</div></div>' +
-          '</div>';
-      }
+      document.getElementById('kpiCards').innerHTML = kpiCard('Total de reservas', total, 'laranja', '👥') + kpiCard('Pagamentos confirmados', pagos, 'verde', '✅') + kpiCard('Pagamentos pendentes', pendentes, 'amarelo', '⏳') + kpiCard('Receita', fmtValor(receita), 'verde', '💰');
+      const a = estado.config.aula; const prox = document.getElementById('proximaAula');
+      if(!a.nome && !a.data && !a.horario){ prox.innerHTML = '<div class="vazio" style="padding:30px"><div class="icone">🏋️</div><h3 style="color:var(--branco)">Nenhuma aula cadastrada</h3><p>Configure a aula na aba "Aula" para ver os dados aqui.</p></div>'; }
+      else { const disp = vagasDisponiveis(); prox.innerHTML = '<div class="grade-campos"><div class="campo campo-escuro"><label>Aula</label><div style="font-weight:800">' + esc(a.nome || 'Sem nome') + '</div></div><div class="campo campo-escuro"><label>Data</label><div style="font-weight:800">' + (a.data ? fmtData(a.data) : 'Não definida') + '</div></div><div class="campo campo-escuro"><label>Horário</label><div style="font-weight:800">' + esc(a.horario || 'Não definido') + '</div></div><div class="campo campo-escuro"><label>Vagas</label><div style="font-weight:800">' + (disp !== null ? disp + ' disponíveis de ' + a.vagas : 'Sem limite') + ' · ' + vagasOcupadas() + ' ocupadas</div></div><div class="campo campo-escuro"><label>Reservas registradas</label><div style="font-weight:800">' + estado.reservas.length + '</div></div></div>'; }
     }
-    function kpiCard(rotulo, numero, cor, icone){
-      return '<div class="kpi"><div class="rotulo">' + icone + ' ' + rotulo + '</div><div class="numero ' + cor + '">' + esc(numero) + '</div></div>';
-    }
-
     function renderVagasAdm(){
-      const a = estado.config.aula;
-      const el = document.getElementById('vagasInfoAdm');
+      const a = estado.config.aula; const el = document.getElementById('vagasInfoAdm');
       const disp = vagasDisponiveis();
-      if(!a.vagas){
-        el.innerHTML = '<p style="color:#888">Defina a quantidade de vagas para controlar a lotação.</p>';
-        return;
-      }
+      if(!a.vagas){ el.innerHTML = '<p style="color:#888">Defina a quantidade de vagas para controlar a lotação.</p>'; return; }
       let status = '<span class="badge badge-pendente">' + disp + ' disponíveis</span>';
       if(disp === 1) status = '<span class="badge badge-ultima">ÚLTIMA VAGA</span>';
       if(disp === 0) status = '<span class="badge badge-lotada">AULA LOTADA</span>';
       el.innerHTML = '<p style="margin-bottom:8px">' + status + ' · ' + vagasOcupadas() + ' ocupadas de ' + a.vagas + '</p>';
     }
-
     function renderReservas(){
-      const busca = (document.getElementById('buscaReservas').value || '').toLowerCase().trim();
+      const filtro = (document.getElementById('buscaReservas').value || '').toLowerCase().trim();
       const tbody = document.getElementById('tbodyReservas');
       const sem = document.getElementById('semReservas');
       const lista = estado.reservas.slice();
-
-      if(busca){
-        const filtrados = lista.filter(function(r){
-          return (r.nome||'').toLowerCase().includes(busca) ||
-                 (r.whatsapp||'').includes(busca) ||
-                 (r.email||'').toLowerCase().includes(busca);
-        });
-        tbody.innerHTML = montarLinhasReservas(filtrados);
-        sem.classList.toggle('hidden', filtrados.length > 0);
-        return;
-      }
-
-      tbody.innerHTML = montarLinhasReservas(lista);
-      sem.classList.toggle('hidden', lista.length > 0);
+      const filtrados = filtro ? lista.filter(function(r){ return (r.nome || '').toLowerCase().includes(filtro) || (r.whatsapp || '').includes(filtro) || (r.email || '').toLowerCase().includes(filtro); }) : lista;
+      tbody.innerHTML = montarLinhasReservas(filtrados);
+      sem.classList.toggle('hidden', filtrados.length > 0);
     }
     function montarLinhasReservas(lista){
       return lista.map(function(r){
         const badge = r.status === 'pago' ? 'badge-pago' : r.status === 'cancelado' ? 'badge-cancelado' : r.status === 'espera' ? 'badge-espera' : 'badge-pendente';
         const rotulo = r.status === 'pago' ? 'Pago' : r.status === 'cancelado' ? 'Cancelado' : r.status === 'espera' ? 'Espera' : 'Pendente';
-
         let acoes = '';
         if(r.status === 'pendente') acoes += '<button class="btn btn-sucesso btn-pequeno" onclick="marcarPago(\'' + r.id + '\')">✅ Pago</button>';
         if(r.status !== 'cancelado') acoes += '<button class="btn btn-perigo btn-pequeno" onclick="cancelarReserva(\'' + r.id + '\')">❌ Cancelar</button>';
         acoes += '<button class="btn btn-pequeno" style="background:var(--cinza-700);color:var(--branco)" onclick="excluirReserva(\'' + r.id + '\')">🗑️ Excluir</button>';
-
-        return '<tr>' +
-          '<td><span class="reserva-id">' + esc(r.id) + '</span><br><span class="reserva-sub">' + fmtDataCurta(r.criada_em) + '</span></td>' +
-          '<td><span class="reserva-nome">' + esc(r.nome) + '</span>' + (r.observacao ? '<br><span class="reserva-sub">' + esc(r.observacao) + '</span>' : '') + '</td>' +
-          '<td>' + esc(r.whatsapp) + '</td>' +
-          '<td>' + esc(r.email || '-') + '</td>' +
-          '<td>' + fmtDataCurta(r.dataAula) + '<br><span class="reserva-sub">' + esc(r.horarioAula || '') + '</span></td>' +
-          '<td>' + (r.valor ? fmtValor(r.valor) : '-') + '</td>' +
-          '<td><span class="badge ' + badge + '">' + rotulo + '</span><br>' +
-            '<select class="status-select" onchange="alterarStatus(\'' + r.id + '\', this.value)">' +
-              '<option value="pendente"' + (r.status==='pendente'?' selected':'') + '>Pendente</option>' +
-              '<option value="pago"' + (r.status==='pago'?' selected':'') + '>Pago</option>' +
-              '<option value="cancelado"' + (r.status==='cancelado'?' selected':'') + '>Cancelado</option>' +
-              '<option value="espera"' + (r.status==='espera'?' selected':'') + '>Espera</option>' +
-            '</select></td>' +
-          '<td><div class="acoes-reserva">' + acoes + '</div></td>' +
-        '</tr>';
+        return '<tr><td><span class="reserva-id">' + esc(r.id) + '</span><br><span class="reserva-sub">' + fmtCurta(r.criada_em) + '</span></td><td><span class="reserva-nome">' + esc(r.nome) + '</span>' + (r.observacao ? '<br><span class="reserva-sub">' + esc(r.observacao) + '</span>' : '') + '</td><td>' + esc(r.whatsapp) + '</td><td>' + esc(r.email || '-') + '</td><td>' + fmtCurta(r.dataAula) + '<br><span class="reserva-sub">' + esc(r.horarioAula || '') + '</span></td><td>' + (r.valor ? fmtValor(r.valor) : '-') + '</td><td><span class="badge ' + badge + '">' + rotulo + '</span><br><select class="status-select" onchange="alterarStatus(\'' + r.id + '\', this.value)"><option value="pendente"' + (r.status === 'pendente' ? ' selected' : '') + '>Pendente</option><option value="pago"' + (r.status === 'pago' ? ' selected' : '') + '>Pago</option><option value="cancelado"' + (r.status === 'cancelado' ? ' selected' : '') + '>Cancelado</option><option value="espera"' + (r.status === 'espera' ? ' selected' : '') + '>Espera</option></select></td><td><div class="acoes-reserva">' + acoes + '</div></td></tr>';
       }).join('');
     }
-    function marcarPago(id){
-      const r = estado.reservas.find(x => x.id === id);
-      if(!r) return;
-      r.status = 'pago';
-      salvarLocal(estado.config, estado.reservas);
-      renderTudo();
-      toast('Reserva marcada como paga.');
-    }
-    function cancelarReserva(id){
-      const r = estado.reservas.find(x => x.id === id);
-      if(!r) return;
-      if(!confirm('Cancelar a reserva de ' + r.nome + '?')) return;
-      r.status = 'cancelado';
-      salvarLocal(estado.config, estado.reservas);
-      renderTudo();
-      toast('Reserva cancelada.');
-    }
-    function excluirReserva(id){
-      const r = estado.reservas.find(x => x.id === id);
-      if(!r) return;
-      if(!confirm('Excluir permanentemente a reserva ' + r.id + '?')) return;
-      estado.reservas = estado.reservas.filter(function(x){ return x.id !== id; });
-      salvarLocal(estado.config, estado.reservas);
-      renderTudo();
-      toast('Reserva excluída.');
-    }
-    function alterarStatus(id, novoStatus){
-      const r = estado.reservas.find(x => x.id === id);
-      if(!r) return;
-      r.status = novoStatus;
-      salvarLocal(estado.config, estado.reservas);
-      renderTudo();
-      toast('Status atualizado para ' + novoStatus + '.');
-    }
+    function marcarPago(id){ const r = estado.reservas.find(x => x.id === id); if(!r) return; r.status = 'pago'; salvarLocal(estado.config, estado.reservas); persistirStatusReserva(id,'pago'); renderTudo(); toast('Reserva marcada como paga.'); }
+    function cancelarReserva(id){ const r = estado.reservas.find(x => x.id === id); if(!r) return; if(!confirm('Cancelar a reserva de ' + r.nome + '?')) return; r.status = 'cancelado'; salvarLocal(estado.config, estado.reservas); persistirStatusReserva(id,'cancelado'); renderTudo(); toast('Reserva cancelada.'); }
+    function excluirReserva(id){ const r = estado.reservas.find(x => x.id === id); if(!r) return; if(!confirm('Excluir permanentemente a reserva ' + r.id + '?')) return; estado.reservas = estado.reservas.filter(x => x.id !== id); salvarLocal(estado.config, estado.reservas); persistirDeleteReserva(id); renderTudo(); toast('Reserva excluída.'); }
+    function alterarStatus(id, novoStatus){ const r = estado.reservas.find(x => x.id === id); if(!r) return; r.status = novoStatus; salvarLocal(estado.config, estado.reservas); persistirStatusReserva(id, novoStatus); renderTudo(); toast('Status atualizado para ' + novoStatus + '.'); }
 
     function renderSelectReservasMsg(){
-      const sel = document.getElementById('selectReservaMsg');
-      if(!sel) return;
+      const sel = document.getElementById('selectReservaMsg'); if(!sel) return;
       const ativas = estado.reservas.filter(r => r.status !== 'cancelado');
-      sel.innerHTML = ativas.map(function(r){
-        return '<option value="' + r.id + '">' + esc(r.nome) + ' · ' + esc(r.id) + '</option>';
-      }).join('');
+      sel.innerHTML = ativas.map(function(r){ return '<option value="' + r.id + '">' + esc(r.nome) + ' · ' + esc(r.id) + '</option>'; }).join('');
       if(ativas.length === 0) sel.innerHTML = '<option value="">Nenhuma reserva ativa</option>';
     }
     function preencherMsg(template, r){
@@ -1381,143 +686,104 @@ Para cancelar: [LINK_CANCELAR]</textarea></div>
         .replace(/\[LINK_CANCELAR\]/g, linkBase() + '#/cancelar/' + encodeURIComponent(r.id || ''));
     }
     function enviarWhatsApp(){
-      const id = document.getElementById('selectReservaMsg').value;
-      const tipo = document.getElementById('selectTipoMsg').value;
-      const r = estado.reservas.find(x => x.id === id);
-      if(!r){ toast('Selecione uma reserva.', 'erro'); return; }
-      const c = estado.config;
-      let template = c.comunicacao.msgConfirmacao;
-      if(tipo === 'pospago') template = c.comunicacao.msgPosPagamento;
-      if(tipo === 'cancelamento') template = c.comunicacao.msgCancelamento;
+      const id = document.getElementById('selectReservaMsg').value; const tipo = document.getElementById('selectTipoMsg').value; const r = estado.reservas.find(x => x.id === id); if(!r){ toast('Selecione uma reserva.', 'erro'); return; }
+      let template = estado.config.comunicacao.msgConfirmacao;
+      if(tipo === 'pospago') template = estado.config.comunicacao.msgPosPagamento;
+      if(tipo === 'cancelamento') template = estado.config.comunicacao.msgCancelamento;
       const msg = preencherMsg(template, r);
       window.open('https://wa.me/' + soDigitos(r.whatsapp) + '?text=' + encodeURIComponent(msg), '_blank');
     }
-
     function alterarSenha(){
-      const nova = document.getElementById('novaSenha').value;
-      const conf = document.getElementById('confirmaSenha').value;
+      const nova = document.getElementById('novaSenha').value; const conf = document.getElementById('confirmaSenha').value;
       if(nova.length < 4){ toast('A senha deve ter pelo menos 4 caracteres.', 'erro'); return; }
       if(nova !== conf){ toast('As senhas não conferem.', 'erro'); return; }
-      estado.config.avancado.senha = nova;
-      agendarSalvarConfig();
-      document.getElementById('novaSenha').value = '';
-      document.getElementById('confirmaSenha').value = '';
-      toast('Senha alterada com sucesso.');
+      estado.config.avancado.senha = nova; salvarLocal(estado.config, estado.reservas); persistirConfig(); document.getElementById('novaSenha').value = ''; document.getElementById('confirmaSenha').value = ''; toast('Senha alterada com sucesso.');
     }
     function fazerBackup(){
       const dados = JSON.stringify({ config: estado.config, reservas: estado.reservas }, null, 2);
-      const blob = new Blob([dados], {type:'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'backup-agendamento.json';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      toast('Backup gerado.');
+      const blob = new Blob([dados], { type:'application/json' });
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'backup-agendamento.json'; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); toast('Backup gerado.');
     }
     function restaurarBackup(){
       const texto = document.getElementById('restoreJson').value.trim();
       if(!texto){ toast('Cole o conteúdo do backup.', 'erro'); return; }
-      try{
+      try {
         const dados = JSON.parse(texto);
         if(!dados.config || !Array.isArray(dados.reservas)) throw new Error('formato inválido');
         if(!confirm('Restaurar este backup? Os dados atuais serão substituídos.')) return;
-        estado.config = mesclar(configPadrao(), dados.config);
-        estado.reservas = dados.reservas;
-        salvarLocal(estado.config, estado.reservas);
-        document.getElementById('restoreJson').value = '';
-        renderTudo();
-        toast('Configurações restauradas.');
-      }catch(e){
-        toast('JSON inválido. Verifique o conteúdo do backup.', 'erro');
-      }
+        estado.config = mesclar(configPadrao(), dados.config); estado.reservas = dados.reservas; salvarLocal(estado.config, estado.reservas); persistirConfig(); document.getElementById('restoreJson').value = ''; renderTudo(); toast('Configurações restauradas.');
+      } catch(e){ toast('JSON inválido. Verifique o conteúdo do backup.', 'erro'); }
     }
     function limparReservas(){
       if(!confirm('Excluir TODAS as reservas? Essa ação não pode ser desfeita.')) return;
-      estado.reservas = [];
-      salvarLocal(estado.config, estado.reservas);
-      renderTudo();
-      toast('Todas as reservas foram excluídas.');
+      estado.reservas = []; salvarLocal(estado.config, estado.reservas); persistirLimparReservas(); renderTudo(); toast('Todas as reservas foram excluídas.');
     }
     function restaurarPadrao(){
       if(!confirm('Restaurar todas as configurações padrão? A senha voltará para 1234 e as reservas serão mantidas.')) return;
-      estado.config = configPadrao();
-      salvarLocal(estado.config, estado.reservas);
-      renderTudo();
-      toast('Configurações restauradas para o padrão.');
+      estado.config = configPadrao(); salvarLocal(estado.config, estado.reservas); persistirConfig(); renderTudo(); toast('Configurações restauradas para o padrão.');
     }
 
-    function setCfg(caminho, valor){
-      const partes = caminho.split('.');
-      let alvo = estado.config;
-      for(let i=0;i<partes.length-1;i++) alvo = alvo[partes[i]];
-      alvo[partes[partes.length-1]] = valor;
-      agendarSalvarConfig();
-      renderTudo();
-    }
-    function atualizarDiaSemana(){
-      const data = estado.config.aula.data;
-      const el = document.getElementById('diaSemanaInfo');
-      if(el) el.value = data ? fmtData(data) : '';
-    }
-    document.addEventListener('input', function(e){
-      const cfg = e.target.getAttribute('data-cfg');
-      if(cfg){ setCfg(cfg, e.target.value); }
-    });
-    document.addEventListener('change', function(e){
-      const cfgSwitch = e.target.getAttribute('data-cfg-switch');
-      if(cfgSwitch){ setCfg(cfgSwitch, e.target.checked); }
-    });
-
+    function atualizarDiaSemana(){ const data = estado.config.aula.data; const el = document.getElementById('diaSemanaInfo'); if(el) el.value = data ? fmtData(data) : ''; }
+    function setCfg(caminho, valor){ const parts = caminho.split('.'); let target = estado.config; for(let i=0;i<parts.length-1;i++) target = target[parts[i]]; target[parts[parts.length-1]] = valor; salvarLocal(estado.config, estado.reservas); persistirConfig(); renderTudo(); }
+    document.addEventListener('input', function(e){ const cfg = e.target.getAttribute('data-cfg'); if(cfg) setCfg(cfg, e.target.value); });
+    document.addEventListener('change', function(e){ const cfgSwitch = e.target.getAttribute('data-cfg-switch'); if(cfgSwitch) setCfg(cfgSwitch, e.target.checked); });
     function abrirSec(sec, botao){
       document.querySelectorAll('.sec-adm').forEach(function(s){ s.classList.remove('ativo'); });
       document.getElementById('sec-' + sec).classList.add('ativo');
       document.querySelectorAll('#admMenu button').forEach(function(b){ b.classList.remove('ativo'); });
       if(botao) botao.classList.add('ativo');
-      if(sec === 'reservas') renderReservas();
-      if(sec === 'dashboard') renderDashboard();
     }
+    function renderTudo(){ renderPublico(); if(!document.getElementById('viewAdm').classList.contains('hidden')){ renderDashboard(); renderVagasAdm(); renderReservas(); renderSelectReservasMsg(); atualizarDiaSemana(); renderHints(); } }
 
-    function toast(msg, tipo){
-      const box = document.getElementById('toasts');
-      const t = document.createElement('div');
-      t.className = 'toast' + (tipo === 'erro' ? ' erro' : tipo === 'sucesso' ? ' sucesso' : '');
-      t.textContent = msg;
-      box.appendChild(t);
-      setTimeout(function(){ t.style.opacity = '0'; t.style.transition = '.4s'; }, 2600);
-      setTimeout(function(){ t.remove(); }, 3100);
+    function salvarDadosNoSupabase(){
+      if(!CONFIGURADO || !supabase) return Promise.resolve();
+      return supabase.from('app_config').upsert({ id:1, dados: estado.config }, { onConflict:'id' }).then(function(){ return supabase.from('reservas').upsert(estado.reservas.map(function(r){ return { ...r, criada_em: r.criada_em || new Date().toISOString() }; }), { onConflict:'id' }); });
     }
+    function persistirConfig(){ if(!CONFIGURADO || !supabase) return Promise.resolve(); return supabase.from('app_config').upsert({ id:1, dados: estado.config }, { onConflict:'id' }).then(function(){ return true; }).catch(function(){ return false; }); }
+    function persistirReserva(reserva){ if(!CONFIGURADO || !supabase) return Promise.resolve(); return supabase.from('reservas').upsert([{ ...reserva, criada_em: reserva.criada_em || new Date().toISOString() }], { onConflict:'id' }).then(function(){ return true; }).catch(function(){ return false; }); }
+    function persistirStatusReserva(id, status){ if(!CONFIGURADO || !supabase) return Promise.resolve(); return supabase.from('reservas').update({ status: status }).eq('id', id).then(function(){ return true; }).catch(function(){ return false; }); }
+    function persistirDeleteReserva(id){ if(!CONFIGURADO || !supabase) return Promise.resolve(); return supabase.from('reservas').delete().eq('id', id).then(function(){ return true; }).catch(function(){ return false; }); }
+    function persistirLimparReservas(){ if(!CONFIGURADO || !supabase) return Promise.resolve(); return supabase.from('reservas').delete().neq('id', 'nao-existe').then(function(){ return true; }).catch(function(){ return false; }); }
 
-    function carregarEstadoInicial(){
+    async function recarregarDados(){
       const local = lerLocal();
       if(local.config) estado.config = mesclar(configPadrao(), local.config);
       if(Array.isArray(local.reservas)) estado.reservas = local.reservas;
-      renderTudo();
-      if(document.getElementById('viewAdm').classList.contains('hidden')){
-        irPara('agendamento');
+
+      if(CONFIGURADO && supabase){
+        try{
+          const { data: cfgData } = await supabase.from('app_config').select('dados').eq('id',1).maybeSingle();
+          const { data: reservasData } = await supabase.from('reservas').select('*').order('criada_em', { ascending: false });
+          if(cfgData && cfgData.dados) estado.config = mesclar(configPadrao(), cfgData.dados);
+          if(Array.isArray(reservasData)) estado.reservas = reservasData;
+          salvarLocal(estado.config, estado.reservas);
+        }catch(e){ console.warn('Supabase indisponível, usando localStorage:', e); }
       }
+      renderTudo();
     }
 
-    function init(){
+    function iniciarRealtime(){
+      if(!CONFIGURADO || !supabase) return;
+      if(window.__mcftChannel){ supabase.removeChannel(window.__mcftChannel); }
+      window.__mcftChannel = supabase.channel('mcft-realtime')
+        .on('postgres_changes', { event:'INSERT', schema:'public', table:'reservas' }, function(){ recarregarDados(); })
+        .on('postgres_changes', { event:'UPDATE', schema:'public', table:'reservas' }, function(){ recarregarDados(); })
+        .on('postgres_changes', { event:'DELETE', schema:'public', table:'reservas' }, function(){ recarregarDados(); })
+        .on('postgres_changes', { event:'*', schema:'public', table:'app_config' }, function(){ recarregarDados(); })
+        .subscribe(function(status){ console.log('Realtime status:', status); });
+    }
+
+    async function init(){
       const hash = location.hash;
       const mCancel = hash.match(/^#\/cancelar\/(.+)$/);
-      const hashAdm = hash === '#/adm';
-
-      carregarEstadoInicial();
-
-      if(mCancel){
-        abrirModalCancelamento(decodeURIComponent(mCancel[1]));
-      }else if(hashAdm){
-        if(sessaoAtiva()) mostrarPainelAdm();
-        else irPara('adm');
-      }else{
-        irPara('agendamento');
-      }
+      await recarregarDados();
+      iniciarRealtime();
+      if(mCancel){ abrirModalCancelamento(decodeURIComponent(mCancel[1])); }
+      else if(hash === '#/adm'){ if(sessaoAtiva()) mostrarPainelAdm(); else irPara('adm'); }
+      else { irPara('agendamento'); }
     }
 
-    init();
+    window.addEventListener('load', init);
   </script>
 </body>
 </html>
